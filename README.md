@@ -95,3 +95,17 @@ Untuk penjelasan lengkap terkait deskripsi dari setiap Role
 Sumber dataset ada disini [Dataset](/assets/Dataset%20Snack%20Depok.csv)
 
 Dataset ini merupakan hasil informasi dari 100 produk cemilan-ringan(snack) yang dikumpulkan dari berbagai sumber oleh kelompok kami.
+
+## Alur Pengintegrasian Proyek Tengah Semester dan Proyek Akhir Semester
+
+1. Integrasi aplikasi mobile dan web service dapat dilakukan dengan car melakukan pengambilan data berformat
+JSON atau Javascript Object Notation di aplikasi mobile pada web service dengan menggunakan ur untuk deploy Proyek Tengah Semester.
+
+2. Proses fetch dapat dilakukan dengan menggunakan HTTP dari dependensi pbp_django_auth di dalam file Dart, lalu mengambilnya menggunakan get dengan tipe application/json.
+
+3. Menambahkan app/authentication pada Django agar memungkinkan login pada Flutter.
+
+3. Selanjutnya, data yang telah diambil tadi dapat di-decode menggunakan jsonDecode() yang nantinya akan di-convert melalui model yang telah dibuat dan ditampilkan secara asinkronus menggunakan widget
+FutureBuilder
+
+4. Data - data JSON tadi dapat digunakan secara CRUD pada kedua media secara asinkronus
