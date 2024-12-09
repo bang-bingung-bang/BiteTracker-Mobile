@@ -92,7 +92,7 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
                               widget.wishlist.add(item);
                             }
                           });
-                          Navigator.pop(context, widget.wishlist);
+                          Navigator.pop(context, widget.wishlist); // Mengembalikan wishlist yang diperbarui
                         },
                         child: const Text("Add to MyBites!"),
                       ),
