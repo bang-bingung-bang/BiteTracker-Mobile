@@ -48,7 +48,6 @@ class _MyHomePageState extends State<MyHomePage> {
     ItemHomepage("Wanna see product list?", Icons.shopping_cart),
   ];
 
-  // Ini adalah list untuk menyimpan wishlist
   final List<MyBitesData> wishlist = [];
 
   void updateWishlist(List<MyBitesData> newWishlist) {
@@ -57,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
       wishlist.addAll(newWishlist);
     });
 
-    print("Updated wishlist: $wishlist");
+    print("Updated wishlist: ${wishlist.map((e) => e.fields.name).toList()}");
   }
 
   @override
@@ -107,12 +106,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     }).toList(),
                   ),
                   const SizedBox(height: 16.0),
-                  // Menampilkan data wishlist di sini
                   Column(
                     children: wishlist.map((MyBitesData item) {
                       return ListTile(
-                        title: Text(item.fields.name),  // Nama produk
-                        subtitle: Text(item.fields.description),  // Deskripsi produk
+                        leading: Image.network(
+                          item.fields.image,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.broken_image, size: 50);
+                          },
+                        ),
+                        title: Text(item.fields.name),
+                        subtitle: Text(item.fields.description),
                       );
                     }).toList(),
                   ),
@@ -156,14 +163,14 @@ class ItemCard extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => ProductsWishlist(
-                  wishlist: wishlist,
+                  wishlist: List.from(wishlist), // Salin list untuk keamanan
                 ),
               ),
             );
-            if (result != null && result.isNotEmpty) { // Pastikan result tidak kosong
-              updateWishlist(result);
+            if (result != null && result.isNotEmpty) { // Periksa jika result valid
+              updateWishlist(result); // Perbarui wishlist di MyHomePage
             } else {
-              print("Wishlist is still empty or no update received.");
+              print("No updates received for wishlist.");
             }
           } else {
             ScaffoldMessenger.of(context)

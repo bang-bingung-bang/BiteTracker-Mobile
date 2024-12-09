@@ -92,6 +92,7 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
                               widget.wishlist.add(item);
                             }
                           });
+                          Navigator.pop(context, widget.wishlist);
                         },
                         child: const Text("Add to MyBites!"),
                       ),
@@ -107,7 +108,7 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pop(context, widget.wishlist);  // Return updated wishlist
+          Navigator.pop(context, widget.wishlist);
         },
         child: const Icon(Icons.check),
       ),
