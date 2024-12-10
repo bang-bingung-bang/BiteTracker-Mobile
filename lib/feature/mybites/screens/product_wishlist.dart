@@ -30,7 +30,16 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Products List'),
+        title: Text(
+          'Products List',
+          style: GoogleFonts.lobster(
+            color: Colors.white,
+            fontWeight: FontWeight.w900,
+            fontSize: 30,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.brown,
       ),
       body: FutureBuilder<List<MyBitesData>>(
         future: _myBitesData,
@@ -43,18 +52,19 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
             final data = snapshot.data!;
             return GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 0.7,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
+                crossAxisCount: 2,
+                childAspectRatio: 0.8,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
               ),
+              padding: const EdgeInsets.all(16),
               itemCount: data.length,
               itemBuilder: (context, index) {
                 final item = data[index];
                 return Card(
-                  elevation: 4,
+                  elevation: 6,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,39 +72,104 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
                       Expanded(
                         child: ClipRRect(
                           borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(8),
+                            top: Radius.circular(12),
                           ),
-                          child: Image.network(
-                            item.fields.image,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
+                          child: Stack(
+                            children: [
+                              Image.network(
+                                item.fields.image,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                              ),
+                              if (item.fields.calorieTag == "low-cal")
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.withOpacity(0.8),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      "Low-Cal",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          item.fields.name,
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.fields.name,
+                              style: GoogleFonts.deliusSwashCaps(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.black87,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Rp. ${item.fields.price}\nStore : ${item.fields.store}\nCalories : ${item.fields.calories}\nCalories Tag : ${item.fields.calorieTag}\nSugar Tag : ${item.fields.sugarTag}\nVegan Tag : ${item.fields.veganTag}\n\n",
+                              style: GoogleFonts.arvo(
+                                fontSize: 14,
+                                color: Colors.brown,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              item.fields.description,
+                              style: GoogleFonts.arvo(
+                                fontSize: 20,
+                                color: Colors.grey[700],
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
                       ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            if (!widget.wishlist.contains(item)) {
-                              widget.wishlist.add(item);
-                            }
-                          });
-                          Navigator.pop(context, widget.wishlist); // Mengembalikan wishlist yang diperbarui
-                        },
-                        child: const Text("Add to MyBites!"),
+                      Center(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            setState(() {
+                              if (!widget.wishlist.contains(item)) {
+                                widget.wishlist.add(item);
+                              }
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${item.fields.name} added to MyBites!'),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.brown,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          icon: const Icon(Icons.favorite),
+                          label: const Text("Add to MyBites!"),
+                        ),
                       ),
                     ],
                   ),
@@ -110,6 +185,7 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
         onPressed: () {
           Navigator.pop(context, widget.wishlist);
         },
+        backgroundColor: Colors.brown,
         child: const Icon(Icons.check),
       ),
     );
