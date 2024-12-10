@@ -55,8 +55,6 @@ class _MyHomePageState extends State<MyHomePage> {
       wishlist.clear();
       wishlist.addAll(newWishlist);
     });
-
-    print("Updated wishlist: ${wishlist.map((e) => e.fields.name).toList()}");
   }
 
   @override
@@ -64,66 +62,200 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'MyBites!',
+          'MyBites',
           style: GoogleFonts.lobster(
             color: Colors.white,
-            fontWeight: FontWeight.w900,
-            fontSize: 30,
+            fontSize: 28,
           ),
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        centerTitle: true,
+        backgroundColor: Colors.brown.shade800,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.brown.shade100, Colors.brown.shade300],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 16.0),
-            Center(
+            Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: Text(
-                      'Welcome To MyBites!!!',
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18.0,
-                      ),
+                  Text(
+                    'Welcome to MyBites!',
+                    style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.brown.shade800,
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: items.map((ItemHomepage item) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ItemCard(
-                          item: item,
-                          wishlist: wishlist,
-                          updateWishlist: updateWishlist,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16.0),
-                  Column(
-                    children: wishlist.map((MyBitesData item) {
-                      return ListTile(
-                        leading: Image.network(
-                          item.fields.image,
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(Icons.broken_image, size: 50);
-                          },
-                        ),
-                        title: Text(item.fields.name),
-                        subtitle: Text(item.fields.description),
-                      );
-                    }).toList(),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Discover and track your favorite snacks.',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      color: Colors.brown.shade600,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: items.map((item) {
+                    return GestureDetector(
+                      onTap: () async {
+                        if (item.name == "Wanna see product list?") {
+                          final newWishlist = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProductsWishlist(
+                                wishlist: List.from(wishlist),
+                              ),
+                            ),
+                          );
+                          if (newWishlist != null &&
+                              newWishlist is List<MyBitesData>) {
+                            updateWishlist(newWishlist);
+                          }
+                        } else {
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                  content: Text("Tapped on ${item.name}!")),
+                            );
+                        }
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.brown.shade200,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.brown.shade100,
+                              offset: Offset(0, 3),
+                              blurRadius: 6,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              item.icon,
+                              size: 40,
+                              color: Colors.brown.shade900,
+                            ),
+                            const SizedBox(width: 16),
+                            Text(
+                              item.name,
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                color: Colors.brown.shade800,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.brown.shade50,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.brown.shade100,
+                      offset: const Offset(0, -2),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Your Bites!',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.brown.shade800,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: wishlist.isNotEmpty
+                            ? ListView.builder(
+                                itemCount: wishlist.length,
+                                itemBuilder: (context, index) {
+                                  final item = wishlist[index];
+                                  return Card(
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: ListTile(
+                                      leading: Image.network(
+                                        item.fields.image,
+                                        width: 50,
+                                        height: 50,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error,
+                                            stackTrace) {
+                                          return Icon(Icons.broken_image,
+                                              size: 50);
+                                        },
+                                      ),
+                                      title: Text(
+                                        item.fields.name,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        item.fields.description,
+                                        style: GoogleFonts.poppins(
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              )
+                            : Center(
+                                child: Text(
+                                  'Your wishlist is empty!',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.brown.shade600,
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -159,24 +291,24 @@ class ItemCard extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           if (item.name == "Wanna see product list?") {
-            final result = await Navigator.push(
+            final newWishlist = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ProductsWishlist(
-                  wishlist: List.from(wishlist), // Salin list untuk keamanan
+                  wishlist: List.from(wishlist),
                 ),
               ),
             );
-            if (result != null && result.isNotEmpty) { // Periksa jika result valid
-              updateWishlist(result); // Perbarui wishlist di MyHomePage
-            } else {
-              print("No updates received for wishlist.");
+
+            // Periksa apakah hasil navigator null
+            if (newWishlist != null && newWishlist is List<MyBitesData>) {
+              updateWishlist(newWishlist);
             }
           } else {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                SnackBar(content: Text("Kamu telah menekan tombol ${item.name}!")),
+                SnackBar(content: Text("Tapped on ${item.name}!")),
               );
           }
         },
