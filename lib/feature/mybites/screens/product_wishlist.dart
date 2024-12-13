@@ -34,158 +34,188 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
           'Products List',
           style: GoogleFonts.lobster(
             color: Colors.white,
-            fontWeight: FontWeight.w900,
-            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            fontSize: 28,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.brown,
+        backgroundColor: Colors.brown.shade700,
       ),
-      body: FutureBuilder<List<MyBitesData>>(
-        future: _myBitesData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            final data = snapshot.data!;
-            return GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.8,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-              ),
-              padding: const EdgeInsets.all(16),
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                final item = data[index];
-                return Card(
-                  elevation: 6,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(12),
-                          ),
-                          child: Stack(
-                            children: [
-                              Image.network(
-                                item.fields.image,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                              ),
-                              if (item.fields.calorieTag == "low-cal")
-                                Positioned(
-                                  top: 8,
-                                  right: 8,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green.withOpacity(0.8),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      "Low-Cal",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.brown.shade50, Colors.brown.shade200],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: FutureBuilder<List<MyBitesData>>(
+          future: _myBitesData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (snapshot.hasData) {
+              final data = snapshot.data!;
+              return GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.75,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                padding: const EdgeInsets.all(16),
+                itemCount: data.length,
+                itemBuilder: (context, index) {
+                  final item = data[index];
+                  String calorieTag = "";
+                  String veganTag = "";
+                  String sugarTag = "";
+                  String store = "";
+                  if (item.fields.veganTag == VeganTag.VEGAN){
+                    veganTag = "Vegan";
+                  } else {
+                    veganTag = "Non Vegan";
+                  }
+
+                  if (item.fields.calorieTag == Tag.HIGH){
+                    calorieTag = "High";
+                  } else {
+                    calorieTag = "Low";
+                  }
+
+                  if (item.fields.sugarTag == Tag.HIGH){
+                    sugarTag = "High";
+                  } else {
+                    sugarTag = "Low";
+                  }
+
+                  if (item.fields.store == Store.AL_HIKAM_MART){
+                    store = "Al Hikam Mart";
+                  } else if (item.fields.store == Store.BELANDA_MART){
+                    store = "Belanda Mart";
+                  } else if (item.fields.store == Store.QITA_MART){
+                    store = "Qita Mart";
+                  } else if (item.fields.store == Store.SNACK_JAYA_MARKET){
+                    store = "Store Jaya Market";
+                  } else if (item.fields.store == Store.TUTUL_V_MARKET){
+                    store = "Tutul V Market";
+                  }
+                  return Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    color: Colors.brown.shade100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(12),
+                            ),
+                            child: Stack(
+                              children: [
+                                Image.network(
+                                  item.fields.image,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [Colors.brown.withOpacity(0.3), Colors.transparent],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
                                     ),
                                   ),
                                 ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.fields.name,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.brown.shade800,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Rp. ${item.fields.price}\nStore : ${store}\nCalories : ${item.fields.calories}\nCalories Tag : ${calorieTag}\nSugar Tag : ${sugarTag}\nVegan Tag : ${veganTag}\n\n",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: Colors.brown,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                item.fields.description,
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: Colors.grey[700],
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ],
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item.fields.name,
-                              style: GoogleFonts.deliusSwashCaps(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.black87,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "Rp. ${item.fields.price}\nStore : ${item.fields.store}\nCalories : ${item.fields.calories}\nCalories Tag : ${item.fields.calorieTag}\nSugar Tag : ${item.fields.sugarTag}\nVegan Tag : ${item.fields.veganTag}\n\n",
-                              style: GoogleFonts.arvo(
-                                fontSize: 14,
-                                color: Colors.brown,
+                        Center(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                if (!widget.wishlist.contains(item)) {
+                                  widget.wishlist.add(item);
+                                }
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('${item.fields.name} added to wishlist!'),
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.brown.shade700,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              item.fields.description,
-                              style: GoogleFonts.arvo(
-                                fontSize: 20,
-                                color: Colors.grey[700],
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Center(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              if (!widget.wishlist.contains(item)) {
-                                widget.wishlist.add(item);
-                              }
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${item.fields.name} added to MyBites!'),
-                                duration: const Duration(seconds: 2),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.brown,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                            icon: const Icon(Icons.favorite),
+                            label: const Text("Add to MyBites!"),
                           ),
-                          icon: const Icon(Icons.favorite),
-                          label: const Text("Add to MyBites!"),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          } else {
-            return const Center(child: Text('No data found.'));
-          }
-        },
+                      ],
+                    ),
+                  );
+                },
+              );
+            } else {
+              return const Center(child: Text('No data found.'));
+            }
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pop(context, widget.wishlist);
         },
-        backgroundColor: Colors.brown,
+        backgroundColor: Colors.brown.shade700,
         child: const Icon(Icons.check),
       ),
     );

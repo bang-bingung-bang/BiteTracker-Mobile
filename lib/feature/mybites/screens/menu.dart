@@ -132,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ..hideCurrentSnackBar()
                             ..showSnackBar(
                               SnackBar(
-                                  content: Text("Tapped on ${item.name}!")),
+                                  content: Text("Anda menekan ${item.name}!")),
                             );
                         }
                       },
@@ -244,7 +244,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               )
                             : Center(
                                 child: Text(
-                                  'Your wishlist is empty!',
+                                  'Your Bites is empty!',
                                   style: GoogleFonts.poppins(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -300,7 +300,6 @@ class ItemCard extends StatelessWidget {
               ),
             );
 
-            // Periksa apakah hasil navigator null
             if (newWishlist != null && newWishlist is List<MyBitesData>) {
               updateWishlist(newWishlist);
             }
@@ -308,7 +307,7 @@ class ItemCard extends StatelessWidget {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                SnackBar(content: Text("Tapped on ${item.name}!")),
+                SnackBar(content: Text("Anda menekan tombol ${item.name}!")),
               );
           }
         },
