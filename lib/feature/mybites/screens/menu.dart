@@ -59,6 +59,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final isLandscape = mediaQuery.orientation == Orientation.landscape;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -79,38 +82,39 @@ class _MyHomePageState extends State<MyHomePage> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Text(
-                    'Welcome to MyBites!',
-                    style: GoogleFonts.poppins(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.brown.shade800,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: isLandscape ? 8 : 16,
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'Welcome to MyBites!',
+                      style: GoogleFonts.poppins(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.brown.shade800,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Discover and track your favorite snacks.',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: Colors.brown.shade600,
+                    const SizedBox(height: 8),
+                    Text(
+                      'Discover and track your favorite snacks.',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        color: Colors.brown.shade600,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: items.map((item) {
                     return GestureDetector(
                       onTap: () async {
@@ -145,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           boxShadow: [
                             BoxShadow(
                               color: Colors.brown.shade100,
-                              offset: Offset(0, 3),
+                              offset: const Offset(0, 3),
                               blurRadius: 6,
                             ),
                           ],
@@ -158,12 +162,14 @@ class _MyHomePageState extends State<MyHomePage> {
                               color: Colors.brown.shade900,
                             ),
                             const SizedBox(width: 16),
-                            Text(
-                              item.name,
-                              style: GoogleFonts.poppins(
-                                fontSize: 18,
-                                color: Colors.brown.shade800,
-                                fontWeight: FontWeight.bold,
+                            Expanded(
+                              child: Text(
+                                item.name,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  color: Colors.brown.shade800,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -173,10 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   }).toList(),
                 ),
               ),
-            ),
-            Expanded(
-              flex: 2,
-              child: Container(
+              Container(
                 decoration: BoxDecoration(
                   color: Colors.brown.shade50,
                   borderRadius: const BorderRadius.only(
@@ -205,7 +208,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Expanded(
+                      SizedBox(
+                        height: mediaQuery.size.height * 0.4,
                         child: wishlist.isNotEmpty
                             ? ListView.builder(
                                 itemCount: wishlist.length,
@@ -257,8 +261,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
