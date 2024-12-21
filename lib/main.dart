@@ -24,8 +24,9 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSwatch(
             primarySwatch: Colors.deepPurple,
-            ).copyWith(secondary: Colors.deepPurple[400]),      ),
-        home: const TrackerBitesPages(),
+            ).copyWith(secondary: Colors.deepPurple[400]),      
+          ),
+        home: const LoginPage(),
       ),
     );
   }

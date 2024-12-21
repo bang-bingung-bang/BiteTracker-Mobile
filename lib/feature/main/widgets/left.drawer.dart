@@ -1,4 +1,5 @@
 import 'package:bite_tracker_mobile/feature/tracker_bites/pages/tracker_bites.dart';
+import 'package:bite_tracker_mobile/feature/authentication/models/user_models.dart';
 import 'package:flutter/material.dart';
 import 'package:bite_tracker_mobile/feature/main/pages/menu.dart';
 
@@ -63,7 +64,21 @@ class LeftDrawer extends StatelessWidget {
                 ),
               );
             },
-          )
+          ),
+          // example of role based widget
+          // if (logInUser?.role == false)
+          //   ListTile(
+          //     leading: const Icon(Icons.people),
+          //     title: const Text('Users'),
+          //     onTap: () {
+          //       Navigator.pushReplacement(
+          //         context,
+          //         MaterialPageRoute(
+          //           builder: (context) => const TrackerBitesPages(),
+          //         ),
+          //       );
+          //     },
+          //   ),
         ],
       ),
     );
