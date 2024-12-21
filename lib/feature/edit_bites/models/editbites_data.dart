@@ -1,196 +1,166 @@
-// lib/models/product.dart
+import 'dart:convert';
+import 'package:flutter/services.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'product.dart';
 
-enum CalorieTag {
-  HIGH('HIGH', 'Tinggi'),
-  LOW('LOW', 'Rendah');
+class EditBitesData {
+  final CookieRequest request;
+  static const String baseUrl = 'http://10.0.2.2:8000';
 
-  final String value;
-  final String label;
-  const CalorieTag(this.value, this.label);
+  EditBitesData({required this.request});
 
-  static CalorieTag fromString(String value) {
-    return CalorieTag.values.firstWhere(
-      (e) => e.value == value,
-      orElse: () => CalorieTag.LOW,
-    );
-  }
-}
-
-enum VeganTag {
-  VEGAN('VEGAN', 'Vegan'),
-  NON_VEGAN('NON_VEGAN', 'Non-vegan');
-
-  final String value;
-  final String label;
-  const VeganTag(this.value, this.label);
-
-  static VeganTag fromString(String value) {
-    return VeganTag.values.firstWhere(
-      (e) => e.value == value,
-      orElse: () => VeganTag.NON_VEGAN,
-    );
-  }
-}
-
-enum SugarTag {
-  HIGH('HIGH', 'Tinggi'),
-  LOW('LOW', 'Rendah');
-
-  final String value;
-  final String label;
-  const SugarTag(this.value, this.label);
-
-  static SugarTag fromString(String value) {
-    return SugarTag.values.firstWhere(
-      (e) => e.value == value,
-      orElse: () => SugarTag.LOW,
-    );
-  }
-}
-
-enum Store {
-  QITA_MART(
-    'QITA_MART',
-    'QITA MART, Jl. K.H.M. Usman No.38, Kukusan, Kecamatan Beji, Kota Depok, Jawa Barat 16425',
-  ),
-  TUTUL_V_MARKET(
-    'TUTUL_V_MARKET',
-    'Tutul V Market, Jl. Margonda No.358, Kemiri Muka, Kecamatan Beji, Kota Depok, Jawa Barat 16423',
-  ),
-  AL_HIKAM_MART(
-    'AL_HIKAM_MART',
-    'Al Hikam Mart, Jl. H. Amat No.21, Kukusan, Kecamatan Beji, Kota Depok, Jawa Barat 16425',
-  ),
-  SNACK_JAYA_MARKET(
-    'SNACK_JAYA_MARKET',
-    'Snack Jaya Market, Jl. Cagar Alam Sel. No.60, RT.01/RW.02, Pancoran MAS, Kec. Pancoran Mas, Kota Depok, Jawa Barat 16436',
-  ),
-  BELANDA_MART(
-    'BELANDA_MART',
-    'Belanda Mart, Jl. Tole Iskandar No.3, Mekar Jaya, Kec. Sukmajaya, Kota Depok, Jawa Barat 16411',
-  );
-
-  final String value;
-  final String address;
-  const Store(this.value, this.address);
-
-  static Store fromString(String value) {
-    return Store.values.firstWhere(
-      (e) => e.value == value,
-      orElse: () => Store.QITA_MART,
-    );
-  }
-}
-
-class Product {
-  final int? id;
-  final Store store;
-  final String name;
-  final int price;
-  final String description;
-  final int calories;
-  final CalorieTag calorieTag;
-  final VeganTag veganTag;
-  final SugarTag sugarTag;
-  final String image;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
-  const Product({
-    this.id,
-    required this.store,
-    required this.name,
-    required this.price,
-    required this.description,
-    required this.calories,
-    required this.calorieTag,
-    required this.veganTag,
-    required this.sugarTag,
-    required this.image,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['pk'],
-      store: Store.fromString(json['fields']['store']),
-      name: json['fields']['name'],
-      price: json['fields']['price'],
-      description: json['fields']['description'],
-      calories: json['fields']['calories'],
-      calorieTag: CalorieTag.fromString(json['fields']['calorie_tag']),
-      veganTag: VeganTag.fromString(json['fields']['vegan_tag']),
-      sugarTag: SugarTag.fromString(json['fields']['sugar_tag']),
-      image: json['fields']['image'],
-      createdAt: DateTime.parse(json['fields']['created_at']),
-      updatedAt: DateTime.parse(json['fields']['updated_at']),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'model': 'editbites.product',
-      if (id != null) 'pk': id,
-      'fields': {
-        'store': store.value,
-        'name': name,
-        'price': price,
-        'description': description,
-        'calories': calories,
-        'calorie_tag': calorieTag.value,
-        'vegan_tag': veganTag.value,
-        'sugar_tag': sugarTag.value,
-        'image': image,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-      },
-    };
-  }
-
-  String getStoreDisplay() {
-    return store.address;
-  }
-
-  String getImageUrl() {
-    if (image.isNotEmpty) {
-      return image;
+  // Get products from API or local assets
+  Future<List<Product>> getProducts() async {
+    try {
+      // Try API first
+      final response = await request.get('$baseUrl/editbites/get_product_json/');
+      if (response != null) {
+        String jsonString = json.encode(response);
+        return productFromJson(jsonString);
+      }
+    } catch (e) {
+      print('Error fetching from API: $e');
+      // If API fails, load from assets
+      return getProductsFromAssets();
     }
-    return 'https://placehold.co/400x300?text=${name.replaceAll(' ', '+')}';
+    // If no data from API, load from assets
+    return getProductsFromAssets();
   }
 
-  @override
-  String toString() {
-    return '$name - ${getStoreDisplay()}';
+  // Load products from local JSON file in assets
+  Future<List<Product>> getProductsFromAssets() async {
+    try {
+      // Read JSON file from assets
+      final String response = await rootBundle.loadString('assets/data/products.json');
+      print('Successfully loaded JSON file from assets');
+      
+      List<dynamic> jsonData = json.decode(response);
+      return jsonData.map((data) => Product.fromJson(data)).toList();
+      
+    } catch (e) {
+      print('Error loading from assets: $e');
+      return [];
+    }
   }
 
-  Product copyWith({
-    int? id,
-    Store? store,
-    String? name,
-    int? price,
-    String? description,
-    int? calories,
-    CalorieTag? calorieTag,
-    VeganTag? veganTag,
-    SugarTag? sugarTag,
-    String? image,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) {
-    return Product(
-      id: id ?? this.id,
-      store: store ?? this.store,
-      name: name ?? this.name,
-      price: price ?? this.price,
-      description: description ?? this.description,
-      calories: calories ?? this.calories,
-      calorieTag: calorieTag ?? this.calorieTag,
-      veganTag: veganTag ?? this.veganTag,
-      sugarTag: sugarTag ?? this.sugarTag,
-      image: image ?? this.image,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
+  // Get single product detail
+  Future<Product> getProductDetail(int id) async {
+    try {
+      // Try API first
+      final response = await request.get('$baseUrl/editbites/product/$id/');
+      if (response != null) {
+        String jsonString = json.encode(response);
+        List<Product> products = productFromJson(jsonString);
+        return products.first;
+      }
+    } catch (e) {
+      print('Error fetching detail from API: $e');
+      // If API fails, try local data
+      final products = await getProductsFromAssets();
+      final product = products.firstWhere(
+        (product) => product.pk == id,
+        orElse: () => throw Exception('Product not found'),
+      );
+      return product;
+    }
+    throw Exception('Failed to load product detail');
+  }
+
+  // Filter products based on criteria
+  Future<List<Product>> getFilteredProducts(String filterType) async {
+    try {
+      List<Product> allProducts = await getProducts();
+      
+      switch (filterType) {
+        case 'high_calories':
+          return allProducts.where((p) => p.fields.calorieTag == "HIGH").toList();
+        case 'low_calories':
+          return allProducts.where((p) => p.fields.calorieTag == "LOW").toList();
+        case 'high_sugar':
+          return allProducts.where((p) => p.fields.sugarTag == "HIGH").toList();
+        case 'low_sugar':
+          return allProducts.where((p) => p.fields.sugarTag == "LOW").toList();
+        case 'vegan':
+          return allProducts.where((p) => p.fields.veganTag == "VEGAN").toList();
+        case 'non_vegan':
+          return allProducts.where((p) => p.fields.veganTag == "NON_VEGAN").toList();
+        default:
+          return allProducts;
+      }
+    } catch (e) {
+      print('Error filtering products: $e');
+      return [];
+    }
+  }
+
+  // Get products by store
+  Future<List<Product>> getProductsByStore(String store) async {
+    try {
+      List<Product> allProducts = await getProducts();
+      return allProducts.where((p) => p.fields.store == store).toList();
+    } catch (e) {
+      print('Error getting products by store: $e');
+      return [];
+    }
+  }
+
+  // Get unique store list
+  Future<List<String>> getStores() async {
+    try {
+      List<Product> products = await getProducts();
+      Set<String> stores = products.map((p) => p.fields.store).toSet();
+      return stores.toList()..sort();
+    } catch (e) {
+      print('Error getting stores list: $e');
+      return [];
+    }
+  }
+
+  // Create new product (admin only)
+  Future<void> createProduct(Product product) async {
+    try {
+      final response = await request.post(
+        '$baseUrl/editbites/mobile/create/',
+        jsonEncode(product.toJson()),
+      );
+      if (response['status'] != 'success') {
+        throw Exception(response['message'] ?? 'Failed to create product');
+      }
+    } catch (e) {
+      print('Error creating product: $e');
+      throw Exception('Failed to create product: $e');
+    }
+  }
+
+  // Update existing product (admin only)
+  Future<void> updateProduct(int id, Product product) async {
+    try {
+      final response = await request.post(
+        '$baseUrl/editbites/mobile/$id/edit/',
+        jsonEncode(product.toJson()),
+      );
+      if (response['status'] != 'success') {
+        throw Exception(response['message'] ?? 'Failed to update product');
+      }
+    } catch (e) {
+      print('Error updating product: $e');
+      throw Exception('Failed to update product: $e');
+    }
+  }
+
+  // Delete product (admin only)
+  Future<void> deleteProduct(int id) async {
+    try {
+      final response = await request.post(
+        '$baseUrl/editbites/mobile/$id/delete/',
+        {},
+      );
+      if (response['status'] != 'success') {
+        throw Exception(response['message'] ?? 'Failed to delete product');
+      }
+    } catch (e) {
+      print('Error deleting product: $e');
+      throw Exception('Failed to delete product: $e');
+    }
   }
 }
