@@ -1,7 +1,10 @@
+////lib\feature\edit_bites\screens\pages\product_detail.dart
+
 import 'package:flutter/material.dart';
 import 'package:bite_tracker_mobile/feature/edit_bites/screens/pages/product_form.dart';
 import 'package:bite_tracker_mobile/feature/edit_bites/models/editbites_data.dart';
 import 'package:bite_tracker_mobile/feature/edit_bites/models/product.dart';
+import 'package:bite_tracker_mobile/feature/authentication/models/user_models.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final int productId;
@@ -38,25 +41,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           actions: [
             TextButton(
               child: const Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.pop(context),
             ),
             TextButton(
               child: const Text('Delete'),
               onPressed: () async {
                 try {
                   await widget.editBitesData.deleteProduct(widget.productId);
-                  if (context.mounted) {
-                    Navigator.of(context).pop(); // Close dialog
-                    Navigator.of(context).pop(); // Go back to list
+                  if (mounted) {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Product deleted successfully')),
                     );
                   }
                 } catch (e) {
-                  if (context.mounted) {
-                    Navigator.of(context).pop(); // Close dialog
+                  if (mounted) {
+                    Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error deleting product: $e')),
+                      SnackBar(content: Text('Error: $e')),
                     );
                   }
                 }
@@ -73,34 +76,34 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Product Detail'),
-        actions: widget.isAdmin
-            ? [
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProductFormScreen(
-                          editBitesData: widget.editBitesData,
-                          isEditing: true,
-                          productId: widget.productId,
-                        ),
-                      ),
-                    ).then((_) {
-                      setState(() {
-                        futureProduct = widget.editBitesData
-                            .getProductDetail(widget.productId);
-                      });
-                    });
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () => _showDeleteConfirmationDialog(),
-                ),
-              ]
-            : null,
+        actions: [
+          if (logInUser?.role == true) ...[
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductFormScreen(
+                      editBitesData: widget.editBitesData,
+                      isEditing: true,
+                      productId: widget.productId,
+                    ),
+                  ),
+                ).then((_) {
+                  setState(() {
+                    futureProduct = widget.editBitesData
+                        .getProductDetail(widget.productId);
+                  });
+                });
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () => _showDeleteConfirmationDialog(),
+            ),
+          ],
+        ],
       ),
       body: FutureBuilder<Product>(
         future: futureProduct,
@@ -111,20 +114,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Image section
                   Image.network(
                     product.fields.image,
                     height: 300,
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
-                  // Content section
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Product name
                         Text(
                           product.fields.name,
                           style: const TextStyle(
@@ -133,7 +133,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        // Price
                         Text(
                           'Rp ${product.fields.price}',
                           style: TextStyle(
@@ -143,13 +142,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        // Description
                         Text(
                           product.fields.description,
                           style: const TextStyle(fontSize: 16),
                         ),
                         const SizedBox(height: 24),
-                        // Product Information with boxes
                         const Text(
                           'Product Information',
                           style: TextStyle(
@@ -235,7 +232,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ],
                         ),
                         const SizedBox(height: 24),
-                        // Store information
                         const Text(
                           'Store Location',
                           style: TextStyle(

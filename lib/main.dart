@@ -1,6 +1,5 @@
 import 'package:bite_tracker_mobile/feature/authentication/pages/login.dart';
 import 'package:flutter/material.dart';
-import 'package:bite_tracker_mobile/feature/edit_bites/screens/main/pages/menu.dart';  // Import EditBitesMenu
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +24,7 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.deepPurple,
           ).copyWith(secondary: Colors.deepPurple[400]),
         ),
-        home: const LoginApp(),  // Mengubah home menjadi EditBitesMenu
+        home: const LoginPage(),
       ),
     );
   }

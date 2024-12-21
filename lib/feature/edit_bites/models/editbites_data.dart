@@ -1,166 +1,185 @@
+// lib/feature/edit_bites/models/editbites_data.dart
+
 import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'product.dart';
+import 'package:bite_tracker_mobile/feature/authentication/models/user_models.dart';
+import 'package:bite_tracker_mobile/feature/edit_bites/models/product.dart';
 
 class EditBitesData {
   final CookieRequest request;
-  static const String baseUrl = 'http://10.0.2.2:8000';
+  static const String baseUrl = 'http://10.0.2.2:8000/productbites';
 
   EditBitesData({required this.request});
 
-  // Get products from API or local assets
   Future<List<Product>> getProducts() async {
     try {
-      // Try API first
-      final response = await request.get('$baseUrl/editbites/get_product_json/');
+      print('Fetching products...');
+      final response = await request.get('$baseUrl/get_product_json/');
+      print('API Response: $response');
+      
       if (response != null) {
-        String jsonString = json.encode(response);
-        return productFromJson(jsonString);
+        List<dynamic> jsonList = response;
+        List<Product> products = [];
+        
+        for (var item in jsonList) {
+          try {
+            products.add(Product(
+              model: item['model'] ?? 'editbites.product',
+              pk: item['pk'] ?? 0,
+              fields: Fields(
+                store: item['fields']['store'] ?? '',
+                name: item['fields']['name'] ?? '',
+                price: item['fields']['price'] ?? 0,
+                description: item['fields']['description'] ?? '',
+                calories: item['fields']['calories'] ?? 0,
+                calorieTag: item['fields']['calorie_tag'] ?? '',
+                veganTag: item['fields']['vegan_tag'] ?? '',
+                sugarTag: item['fields']['sugar_tag'] ?? '',
+                image: item['fields']['image'] ?? '',
+                createdAt: DateTime.parse(item['fields']['created_at'] ?? DateTime.now().toIso8601String()),
+                updatedAt: DateTime.parse(item['fields']['updated_at'] ?? DateTime.now().toIso8601String()),
+              ),
+            ));
+          } catch (e) {
+            print('Error parsing product: $e');
+          }
+        }
+        return products;
+      } else {
+        throw Exception('Failed to load products from API.');
       }
     } catch (e) {
       print('Error fetching from API: $e');
-      // If API fails, load from assets
-      return getProductsFromAssets();
-    }
-    // If no data from API, load from assets
-    return getProductsFromAssets();
-  }
-
-  // Load products from local JSON file in assets
-  Future<List<Product>> getProductsFromAssets() async {
-    try {
-      // Read JSON file from assets
-      final String response = await rootBundle.loadString('assets/data/products.json');
-      print('Successfully loaded JSON file from assets');
-      
-      List<dynamic> jsonData = json.decode(response);
-      return jsonData.map((data) => Product.fromJson(data)).toList();
-      
-    } catch (e) {
-      print('Error loading from assets: $e');
-      return [];
+      rethrow;
     }
   }
 
-  // Get single product detail
   Future<Product> getProductDetail(int id) async {
     try {
-      // Try API first
-      final response = await request.get('$baseUrl/editbites/product/$id/');
-      if (response != null) {
-        String jsonString = json.encode(response);
-        List<Product> products = productFromJson(jsonString);
-        return products.first;
+      print('Fetching product details...');
+      final response = await request.get('$baseUrl/get_product_json/');
+      print('Product Detail Response: $response');
+
+      if (response != null && response is List && response.isNotEmpty) {
+        var productItem = response.firstWhere((item) => item['pk'] == id, orElse: () => null);
+        
+        if (productItem != null) {
+          return Product(
+            model: productItem['model'] ?? 'editbites.product',
+            pk: productItem['pk'] ?? 0,
+            fields: Fields(
+              store: productItem['fields']['store'] ?? '',
+              name: productItem['fields']['name'] ?? '',
+              price: productItem['fields']['price'] ?? 0,
+              description: productItem['fields']['description'] ?? '',
+              calories: productItem['fields']['calories'] ?? 0,
+              calorieTag: productItem['fields']['calorie_tag'] ?? '',
+              veganTag: productItem['fields']['vegan_tag'] ?? '',
+              sugarTag: productItem['fields']['sugar_tag'] ?? '',
+              image: productItem['fields']['image'] ?? '',
+              createdAt: DateTime.parse(productItem['fields']['created_at'] ?? DateTime.now().toIso8601String()),
+              updatedAt: DateTime.parse(productItem['fields']['updated_at'] ?? DateTime.now().toIso8601String()),
+            ),
+          );
+        }
       }
+      throw Exception('Product not found');
     } catch (e) {
-      print('Error fetching detail from API: $e');
-      // If API fails, try local data
-      final products = await getProductsFromAssets();
-      final product = products.firstWhere(
-        (product) => product.pk == id,
-        orElse: () => throw Exception('Product not found'),
-      );
-      return product;
-    }
-    throw Exception('Failed to load product detail');
-  }
-
-  // Filter products based on criteria
-  Future<List<Product>> getFilteredProducts(String filterType) async {
-    try {
-      List<Product> allProducts = await getProducts();
-      
-      switch (filterType) {
-        case 'high_calories':
-          return allProducts.where((p) => p.fields.calorieTag == "HIGH").toList();
-        case 'low_calories':
-          return allProducts.where((p) => p.fields.calorieTag == "LOW").toList();
-        case 'high_sugar':
-          return allProducts.where((p) => p.fields.sugarTag == "HIGH").toList();
-        case 'low_sugar':
-          return allProducts.where((p) => p.fields.sugarTag == "LOW").toList();
-        case 'vegan':
-          return allProducts.where((p) => p.fields.veganTag == "VEGAN").toList();
-        case 'non_vegan':
-          return allProducts.where((p) => p.fields.veganTag == "NON_VEGAN").toList();
-        default:
-          return allProducts;
-      }
-    } catch (e) {
-      print('Error filtering products: $e');
-      return [];
+      print('Error fetching detail: $e');
+      rethrow;
     }
   }
 
-  // Get products by store
-  Future<List<Product>> getProductsByStore(String store) async {
-    try {
-      List<Product> allProducts = await getProducts();
-      return allProducts.where((p) => p.fields.store == store).toList();
-    } catch (e) {
-      print('Error getting products by store: $e');
-      return [];
+  Future<String> createProduct(Product product) async {
+    if (logInUser?.role != true) {
+      throw Exception('Unauthorized: Admin access required');
     }
-  }
 
-  // Get unique store list
-  Future<List<String>> getStores() async {
-    try {
-      List<Product> products = await getProducts();
-      Set<String> stores = products.map((p) => p.fields.store).toSet();
-      return stores.toList()..sort();
-    } catch (e) {
-      print('Error getting stores list: $e');
-      return [];
-    }
-  }
-
-  // Create new product (admin only)
-  Future<void> createProduct(Product product) async {
     try {
       final response = await request.post(
-        '$baseUrl/editbites/mobile/create/',
-        jsonEncode(product.toJson()),
+        '$baseUrl/mobile/create/',
+        jsonEncode({
+          'fields': {
+            'store': product.fields.store,
+            'name': product.fields.name,
+            'price': product.fields.price,
+            'description': product.fields.description,
+            'calories': product.fields.calories,
+            'calorie_tag': product.fields.calorieTag,
+            'vegan_tag': product.fields.veganTag,
+            'sugar_tag': product.fields.sugarTag,
+            'image': product.fields.image,
+          }
+        }),
       );
-      if (response['status'] != 'success') {
-        throw Exception(response['message'] ?? 'Failed to create product');
+      print('Create Response: $response');
+
+      if (response['status'] == 'success') {
+        return response['message'];
+      } else {
+        throw Exception(response['message'] ?? 'Failed to create product.');
       }
     } catch (e) {
       print('Error creating product: $e');
-      throw Exception('Failed to create product: $e');
+      rethrow;
     }
   }
 
-  // Update existing product (admin only)
-  Future<void> updateProduct(int id, Product product) async {
+  Future<String> updateProduct(int id, Product product) async {
+    if (logInUser?.role != true) {
+      throw Exception('Unauthorized: Admin access required');
+    }
+
     try {
       final response = await request.post(
-        '$baseUrl/editbites/mobile/$id/edit/',
-        jsonEncode(product.toJson()),
+        '$baseUrl/mobile/$id/edit/',
+        jsonEncode({
+          'fields': {
+            'store': product.fields.store,
+            'name': product.fields.name,
+            'price': product.fields.price,
+            'description': product.fields.description,
+            'calories': product.fields.calories,
+            'calorie_tag': product.fields.calorieTag,
+            'vegan_tag': product.fields.veganTag,
+            'sugar_tag': product.fields.sugarTag,
+            'image': product.fields.image,
+          }
+        }),
       );
-      if (response['status'] != 'success') {
-        throw Exception(response['message'] ?? 'Failed to update product');
+      print('Update Response: $response');
+
+      if (response['status'] == 'success') {
+        return response['message'];
+      } else {
+        throw Exception(response['message'] ?? 'Failed to update product.');
       }
     } catch (e) {
       print('Error updating product: $e');
-      throw Exception('Failed to update product: $e');
+      rethrow;
     }
   }
 
-  // Delete product (admin only)
-  Future<void> deleteProduct(int id) async {
+  Future<String> deleteProduct(int id) async {
+    if (logInUser?.role != true) {
+      throw Exception('Unauthorized: Admin access required');
+    }
+
     try {
       final response = await request.post(
-        '$baseUrl/editbites/mobile/$id/delete/',
+        '$baseUrl/mobile/$id/delete/',
         {},
       );
-      if (response['status'] != 'success') {
-        throw Exception(response['message'] ?? 'Failed to delete product');
+      print('Delete Response: $response');
+
+      if (response['status'] == 'success') {
+        return response['message'];
+      } else {
+        throw Exception(response['message'] ?? 'Failed to delete product.');
       }
     } catch (e) {
       print('Error deleting product: $e');
-      throw Exception('Failed to delete product: $e');
+      rethrow;
     }
   }
 }
