@@ -23,9 +23,9 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSwatch(
             primarySwatch: Colors.deepPurple,
-          ).copyWith(secondary: Colors.deepPurple[400]),
-        ),
-        home: const LoginApp(),  // Mengubah home menjadi EditBitesMenu
+            ).copyWith(secondary: Colors.deepPurple[400]),      
+          ),
+        home: const LoginPage(),
       ),
     );
   }
