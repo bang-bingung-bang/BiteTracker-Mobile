@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSwatch(
             primarySwatch: Colors.deepPurple,
             ).copyWith(secondary: Colors.deepPurple[400]),      ),
-        home: const TrackerBitesPages(),
+        home: const TrackerBitesPages(), //agus
       ),
     );
   }
