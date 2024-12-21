@@ -1,8 +1,5 @@
-import 'package:bite_tracker_mobile/feature/authentication/pages/login.dart';
-import 'package:bite_tracker_mobile/feature/tracker_bites/pages/tracker_bites.dart';
 import 'package:flutter/material.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:provider/provider.dart';
+import 'package:bite_tracker_mobile/feature/mybites/screens/menu.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,7 +22,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSwatch(
             primarySwatch: Colors.deepPurple,
             ).copyWith(secondary: Colors.deepPurple[400]),      ),
-        home: const TrackerBitesPages(), //agus
+        home: const TrackerBitesPages(),
       ),
     );
   }

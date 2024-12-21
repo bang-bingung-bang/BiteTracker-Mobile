@@ -30,85 +30,169 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Products List'),
+        title: Text(
+          'Products List',
+          style: GoogleFonts.lobster(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 28,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.brown.shade700,
       ),
-      body: FutureBuilder<List<MyBitesData>>(
-        future: _myBitesData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            final data = snapshot.data!;
-            return GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 0.7,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                final item = data[index];
-                return Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(8),
-                          ),
-                          child: Image.network(
-                            item.fields.image,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.brown.shade50, Colors.brown.shade200],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: FutureBuilder<List<MyBitesData>>(
+          future: _myBitesData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (snapshot.hasData) {
+              final data = snapshot.data!;
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  return GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.75,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      final item = data[index];
+                      String calorieTag = item.fields.calorieTag == Tag.HIGH ? "High" : "Low";
+                      String veganTag = item.fields.veganTag == VeganTag.VEGAN ? "Vegan" : "Non Vegan";
+                      String sugarTag = item.fields.sugarTag == Tag.HIGH ? "High" : "Low";
+                      String store = {
+                        Store.AL_HIKAM_MART: "Al Hikam Mart",
+                        Store.BELANDA_MART: "Belanda Mart",
+                        Store.QITA_MART: "Qita Mart",
+                        Store.SNACK_JAYA_MARKET: "Snack Jaya Market",
+                        Store.TUTUL_V_MARKET: "Tutul V Market",
+                      }[item.fields.store] ?? "Unknown Store";
+
+                      return Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          item.fields.name,
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                        color: Colors.brown.shade100,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(12),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Image.network(
+                                      item.fields.image,
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [Colors.brown.withOpacity(0.3), Colors.transparent],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.fields.name,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.brown.shade800,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "Rp. ${item.fields.price}\nStore: $store\nCalories: ${item.fields.calories}\nCalories Tag: $calorieTag\nSugar Tag: $sugarTag\nVegan Tag: $veganTag",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        color: Colors.brown,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      item.fields.description,
+                                      style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Center(
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  setState(() {
+                                    if (!widget.wishlist.contains(item)) {
+                                      widget.wishlist.add(item);
+                                    }
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('${item.fields.name} added to MyBites!'),
+                                      duration: const Duration(seconds: 2),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.favorite),
+                                label: const Text("Add to MyBites"),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            if (!widget.wishlist.contains(item)) {
-                              widget.wishlist.add(item);
-                            }
-                          });
-                        },
-                        child: const Text("Add to MyBites!"),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          } else {
-            return const Center(child: Text('No data found.'));
-          }
-        },
+                      );
+                    },
+                  );
+                },
+              );
+            } else {
+              return const Center(child: Text('No data found.'));
+            }
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pop(context, widget.wishlist);  // Return updated wishlist
+          Navigator.pop(context, widget.wishlist);
         },
+        backgroundColor: Colors.brown.shade700,
         child: const Icon(Icons.check),
       ),
     );
