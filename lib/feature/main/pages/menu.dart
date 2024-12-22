@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: const Color(0xFF533A2E),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
