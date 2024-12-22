@@ -1,3 +1,4 @@
+import 'package:bite_tracker_mobile/feature/main/pages/footer.dart';
 import 'package:bite_tracker_mobile/feature/main/pages/menu.dart';
 import 'package:bite_tracker_mobile/feature/sharebites/models/sharebites_data.dart';
 import 'package:bite_tracker_mobile/feature/sharebites/screens/create_sharebites.dart';
@@ -6,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:google_fonts/google_fonts.dart';
+
 import 'dart:convert';
 
 class ShareBitesScreen extends StatefulWidget {
@@ -16,6 +19,14 @@ class ShareBitesScreen extends StatefulWidget {
 }
 
 class _ShareBitesScreenState extends State<ShareBitesScreen> {
+  int _selectedIndex = 3; // Index for ShareBites
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   Future<List<ShareBites>> fetchShareBites(CookieRequest request) async {
     final response = await request.get('http://localhost:8000/sharebites/json/');
     List<ShareBites> listShareBites = [];
@@ -54,24 +65,15 @@ class _ShareBitesScreenState extends State<ShareBitesScreen> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
     return Scaffold(
-      // Mengubah AppBar dengan background hitam
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back), // Ikon back
-          color: Colors.white,                // Warna ikon
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const MyHomePage()),
-            );
-          },
-        ),
-        title: const Text(
+        title: Text(
           'ShareBites',
-          style: TextStyle(
-            color: Colors.white,  // Mengubah warna teks menjadi putih
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
+          style: GoogleFonts.lobster(
+            textStyle: const TextStyle(
+              fontSize: 40.0, 
+              fontWeight: FontWeight.bold,
+              color: Colors.white, 
+            ),
           ),
         ),
         backgroundColor: const Color(0xFF533A2E),  // Mengubah background menjadi hitam
@@ -139,6 +141,10 @@ class _ShareBitesScreenState extends State<ShareBitesScreen> {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: FooterNavigationBar(
+        selectedIndex: _selectedIndex, 
+        onItemTapped: _onItemTapped,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

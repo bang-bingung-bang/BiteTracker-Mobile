@@ -71,6 +71,7 @@ flutter:
     - assets/images/trackerbites_icon3.png
     - assets/images/trackerbites_icon4.png
     - assets/svgs/trackerbites_background.svg
+    - assets/images/background.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:

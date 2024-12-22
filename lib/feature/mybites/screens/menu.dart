@@ -1,3 +1,4 @@
+import 'package:bite_tracker_mobile/feature/main/pages/footer.dart';
 import 'package:bite_tracker_mobile/feature/mybites/models/mybites_data.dart';
 import 'package:bite_tracker_mobile/feature/mybites/screens/product_wishlist.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +44,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int _selectedIndex = 1; // Index for MyBites
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   final List<ItemHomepage> items = [
     ItemHomepage("Let's go back to main page!", Icons.add_home_work_rounded),
     ItemHomepage("Wanna see product list?", Icons.shopping_cart),
@@ -264,6 +273,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: FooterNavigationBar(
+        selectedIndex: _selectedIndex, 
+        onItemTapped: _onItemTapped,
       ),
     );
   }
