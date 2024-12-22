@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bite_tracker_mobile/core/assets.dart';
 import 'package:bite_tracker_mobile/feature/tracker_bites/models/trackerbites_models.dart';
 import 'package:bite_tracker_mobile/feature/tracker_bites/pages/tracker_bites_edit.dart';
 import 'package:bite_tracker_mobile/feature/tracker_bites/pages/tracker_bites_form.dart';
@@ -60,7 +61,7 @@ class _TrackerBitesListPagesState extends State<TrackerBitesListPages> {
   Future<List<BiteTrackerModel>> _fetchBites(CookieRequest request) async {
     String formattedDate = "${widget.date.year}-${widget.date.month.toString().padLeft(2, '0')}-${widget.date.day.toString().padLeft(2, '0')}";
 
-    final response = await request.get('http://127.0.0.1:8000/show-json-by-date/$formattedDate/');
+    final response = await request.get('https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/show-json-by-date/$formattedDate/');
     var data = response;
 
     if (kDebugMode) {
@@ -81,7 +82,7 @@ class _TrackerBitesListPagesState extends State<TrackerBitesListPages> {
 
   Future<void> _deleteBite(CookieRequest request, String pk) async {
     final response = await request.postJson(
-      'http://127.0.0.1:8000/delete-bite-flutter/$pk/',
+      'https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/delete-bite-flutter/$pk/',
       jsonEncode(<String, String>{'pk': pk}),
     );
 
@@ -100,189 +101,207 @@ class _TrackerBitesListPagesState extends State<TrackerBitesListPages> {
     final request = context.read<CookieRequest>();
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(59, 158, 158, 158),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(Assets.images.background),
+            fit: BoxFit.cover,
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(30.0),
-        child: Column(
-          children: [
-            Text(
-              widget.time,
-              style: GoogleFonts.poppins(
-                textStyle: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w500,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(30.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color.fromARGB(132, 151, 143, 143)
                 ),
-              ),
-            ),
-            const SizedBox(height: 20.0),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color.fromARGB(255, 221, 221, 221)),
-                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                color: const Color(0xFFB99867),
-                boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFB99867).withOpacity(0.3),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-              ),
-              child: FutureBuilder<List<BiteTrackerModel>>(
-                future: _futureBites, // _fetchBites(request),
-                builder: (context, snapshot) {
-                  if (kDebugMode) {
-                    print(snapshot.connectionState);
-                  }
-                  if (snapshot.data == null) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else {
-                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Center(
-                          child: Column(
-                            children: [
-                              const Icon(
-                                Icons.warning,
-                                size: 50,
-                                color: Colors.grey,
-                              ),
-                              Text(
-                                'No bites found',
-                                style: GoogleFonts.poppins(
-                                  textStyle: const TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    } else {
-                      final bites = snapshot.data!;
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: bites.length,
-                        separatorBuilder: (_, index) => const Divider(),
-                        itemBuilder: (_, index) {
-                          final bite = bites[index];
-                          return Card(
-                            child: ListTile(
-                              title: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    bite.fields.biteName,
-                                    style: GoogleFonts.poppins(
-                                      textStyle: const TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${bite.fields.biteCalories} calories',
-                                    style: GoogleFonts.poppins(
-                                      textStyle: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              trailing: PopupMenuButton<String>(
-                                onSelected: (String value) {
-                                  if (value == 'edit') {
-                                    _navigateToEditPage(context, request, bite);
-                                  } else if (value == 'delete') {
-                                    _deleteBite(request, bite.pk);
-                                  }
-                                },
-                                itemBuilder: (BuildContext context) {
-                                  return [
-                                    PopupMenuItem<String>(
-                                      value: 'edit',
-                                      child: Text(
-                                        'Edit',
-                                        style: GoogleFonts.poppins(
-                                          textStyle: const TextStyle(
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    PopupMenuItem<String>(
-                                      value: 'delete',
-                                      child: Text(
-                                        'Delete',
-                                        style: GoogleFonts.poppins(
-                                          textStyle: const TextStyle(
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ];
-                                },
-                                icon: const Icon(Icons.chevron_right),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    }
-                  }
-                },
-              ),
-            ),
-            const SizedBox(height: 20.0),
-            Container(
-              width: double.infinity,
-              height: 50,
-              decoration: BoxDecoration(
-                color: const Color(0xFF533A2E),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: ElevatedButton(
-                onPressed: () => _navigateToFormPage(context, request),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFB99867),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: Colors.black,
                   ),
+                  onPressed: () => Navigator.pop(context),
                 ),
+              ),
+              const SizedBox(height: 20.0),
+              Center(
                 child: Text(
-                  'Add New Bite',
+                  widget.time,
                   style: GoogleFonts.poppins(
                     textStyle: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 24,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
               ),
-            )
-          ],
+              const SizedBox(height: 20.0),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  border: Border.all(color: const Color.fromARGB(255, 221, 221, 221)),
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  color: const Color(0xFFB99867),
+                  boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFB99867).withOpacity(0.3),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                ),
+                child: FutureBuilder<List<BiteTrackerModel>>(
+                  future: _futureBites, // _fetchBites(request),
+                  builder: (context, snapshot) {
+                    if (kDebugMode) {
+                      print(snapshot.connectionState);
+                    }
+                    if (snapshot.data == null) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else {
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                const Icon(
+                                  Icons.warning,
+                                  size: 50,
+                                  color: Colors.grey,
+                                ),
+                                Text(
+                                  'No bites found',
+                                  style: GoogleFonts.poppins(
+                                    textStyle: const TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      } else {
+                        final bites = snapshot.data!;
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: bites.length,
+                          separatorBuilder: (_, index) => const Divider(),
+                          itemBuilder: (_, index) {
+                            final bite = bites[index];
+                            return Card(
+                              child: ListTile(
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      bite.fields.biteName,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${bite.fields.biteCalories} calories',
+                                      style: GoogleFonts.poppins(
+                                        textStyle: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                trailing: PopupMenuButton<String>(
+                                  onSelected: (String value) {
+                                    if (value == 'edit') {
+                                      _navigateToEditPage(context, request, bite);
+                                    } else if (value == 'delete') {
+                                      _deleteBite(request, bite.pk);
+                                    }
+                                  },
+                                  itemBuilder: (BuildContext context) {
+                                    return [
+                                      PopupMenuItem<String>(
+                                        value: 'edit',
+                                        child: Text(
+                                          'Edit',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: const TextStyle(
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      PopupMenuItem<String>(
+                                        value: 'delete',
+                                        child: Text(
+                                          'Delete',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: const TextStyle(
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ];
+                                  },
+                                  icon: const Icon(Icons.chevron_right),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 20.0),
+              Container(
+                width: double.infinity,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF533A2E),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: ElevatedButton(
+                  onPressed: () => _navigateToFormPage(context, request),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFB99867),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    'Add New Bite',
+                    style: GoogleFonts.poppins(
+                      textStyle: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

@@ -1,5 +1,4 @@
 import 'package:bite_tracker_mobile/feature/main/pages/footer.dart';
-import 'package:bite_tracker_mobile/feature/main/pages/menu.dart';
 import 'package:bite_tracker_mobile/feature/sharebites/models/sharebites_data.dart';
 import 'package:bite_tracker_mobile/feature/sharebites/screens/create_sharebites.dart';
 import 'package:bite_tracker_mobile/feature/sharebites/widgets/sharebites_card.dart';
@@ -9,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 
-import 'dart:convert';
 
 class ShareBitesScreen extends StatefulWidget {
   const ShareBitesScreen({super.key});
@@ -28,7 +26,7 @@ class _ShareBitesScreenState extends State<ShareBitesScreen> {
   }
 
   Future<List<ShareBites>> fetchShareBites(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/sharebites/json/');
+    final response = await request.get('https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/sharebites/json/');
     List<ShareBites> listShareBites = [];
     for (var d in response) {
       if (d != null) {
@@ -41,7 +39,7 @@ class _ShareBitesScreenState extends State<ShareBitesScreen> {
   Future<void> deletePost(int postId) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://localhost:8000/sharebites/post/$postId/delete/'),
+        Uri.parse('https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/sharebites/post/$postId/delete/'),
       );
 
       if (response.statusCode == 204) {

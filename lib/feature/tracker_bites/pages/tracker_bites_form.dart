@@ -68,7 +68,7 @@ class _BiteTrackerFormPageState extends State<BiteTrackerFormPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Bites Name',
@@ -234,7 +234,7 @@ class _BiteTrackerFormPageState extends State<BiteTrackerFormPage> {
                       String formattedDate = "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
                                   // Kirim ke Django dan tunggu respons
                       final response = await request.postJson(
-                        "http://127.0.0.1:8000/add_bites_flutter/",
+                        "https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/add_bites_flutter/",
                         jsonEncode(<String, String>{
                           "bite_name": _foodName,
                           "bite_calories": _calorie.toString(),
