@@ -1,14 +1,13 @@
-import 'package:bite_tracker_mobile/feature/main/pages/footer.dart';
 import 'package:bite_tracker_mobile/feature/mybites/models/mybites_data.dart';
 import 'package:bite_tracker_mobile/feature/mybites/screens/product_wishlist.dart';
 import 'package:bite_tracker_mobile/feature/main/pages/menu.dart';
-import 'package:bite_tracker_mobile/main.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:bite_tracker_mobile/feature/main/pages/footer.dart';
 
 void main() {
   runApp(const MyBitesApp());
@@ -50,7 +49,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 1; // Index for MyBites
+  List<MyBitesData> wishlist = [];
+
+  int _selectedIndex = 4;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -58,17 +59,11 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  final List<ItemHomepage> items = [
-    ItemHomepage("Let's go back to main page!", Icons.add_home_work_rounded),
-    ItemHomepage("Wanna see product list?", Icons.shopping_cart),
-  ];
-
-  final List<MyBitesData> wishlist = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadWishlist(context.read<CookieRequest>());
+  void updateWishlist(List<MyBitesData> newWishlist) {
+    setState(() {
+      wishlist.clear();
+      wishlist.addAll(newWishlist);
+    });
   }
 
   Future<void> saveWishlist() async {
@@ -78,32 +73,132 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.setStringList('wishlist', wishlistJson);
   }
 
-  List<MyBitesData> parseWishlist(String responseBody) {
-    final List<dynamic> parsed = jsonDecode(responseBody);
-    return parsed.map((json) => MyBitesData.fromJson(json)).toList();
+  @override
+  void initState() {
+    super.initState();
+    loadWishlist(context.read<CookieRequest>());
+  }
+
+  void addToWishlist(MyBitesData product) async {
+    try {
+      final request = context.read<CookieRequest>();
+      final response = await request.post(
+        'http://127.0.0.1:8000/mybites/flutter/add/',
+        {
+          'product_id': product.pk.toString(),
+        },
+      );
+
+      if (response['status'] == true) {
+        setState(() {
+          wishlist.add(product);
+        });
+
+        saveWishlist();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Product added to wishlist successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? 'Failed to add product to wishlist'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Future<void> loadWishlist(CookieRequest request) async {
-    if (!request.loggedIn) {
-      return;
-    }
+      if (!request.loggedIn) return;
 
-    try {
-      final response = await request.get('http://127.0.0.1:8000/mybites/flutter/view/');
-      print(response);
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-        if (data['wishlist'] != null) {
-          final List<MyBitesData> fetchedWishlist = parseWishlist(jsonEncode(data['wishlist']));
-          setState(() {
-            wishlist.clear();
-            wishlist.addAll(fetchedWishlist);
-          });
+      try {
+        final response = await request.get('http://127.0.0.1:8000/mybites/flutter/view/');
+        if (response['wishlist'] != null) {
+          final List<MyBitesData> fetchedWishlist = 
+              (response['wishlist'] as List).map((json) => MyBitesData.fromJson(json)).toList();
+          
+          if (mounted) {
+            setState(() {
+              wishlist = fetchedWishlist;
+            });
+          }
+          
+          saveWishlist();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to load wishlist: $e')),
+          );
         }
       }
-    } catch (e) {
+  }
 
+  Future<void> removeFromWishlist(MyBitesData product) async {
+    try {
+      final request = context.read<CookieRequest>();
+      final product_id = product.pk;
+
+      final response = await request.post(
+        'http://127.0.0.1:8000/mybites/flutter/remove/$product_id/',
+        {}
+      );
+
+      if (response['status'] == true) {
+        setState(() {
+          wishlist.remove(product);
+        });
+
+        saveWishlist();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Product removed from wishlist successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? 'Failed to remove product from wishlist'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
+  }
+
+  Future<bool> _addProductToWishlist(MyBitesData product) async {
+    try {
+      await Future.delayed(Duration(seconds: 1));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  List<MyBitesData> parseWishlist(String responseBody) {
+    final List<dynamic> parsed = jsonDecode(responseBody);
+    return parsed.map((json) => MyBitesData.fromJson(json)).toList();
   }
 
   Future<List<MyBitesData>> loadWishlistFuture(CookieRequest request) async {
@@ -124,13 +219,10 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void updateWishlist(List<MyBitesData> newWishlist) {
-    setState(() {
-      wishlist.clear();
-      wishlist.addAll(newWishlist);
-    });
-    saveWishlist();
-  }
+  final List<ItemHomepage> items = [
+    ItemHomepage("Let's go back to main page!", Icons.add_home_work_rounded),
+    ItemHomepage("Wanna see product list?", Icons.shopping_cart),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +307,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                 wishlist: List.from(wishlist),
                               ),
                             ),
-                          );
+                          ).then((_) {
+                            setState(() {
+                              loadWishlist(context.read<CookieRequest>());
+                            });
+                          });
                           if (newWishlist != null &&
                               newWishlist is List<MyBitesData>) {
                             updateWishlist(newWishlist);
@@ -224,7 +320,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const MyApp(),
+                              builder: (context) => const HomePage(),
                             ),
                           );
                         }
@@ -299,28 +395,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 8),
                       SizedBox(
                         height: mediaQuery.size.height * 0.4,
-                        child: FutureBuilder<List<MyBitesData>>(
-                          future: loadWishlistFuture(request),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                child: Text(
-                                  'Error: ${snapshot.error}',
-                                  style: GoogleFonts.poppins(fontSize: 18, color: Colors.red),
-                                ),
-                              );
-                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                              return Center(
+                        child: wishlist.isEmpty
+                            ? Center(
                                 child: Text(
                                   'Your Bites is empty',
                                   style: GoogleFonts.poppins(fontSize: 18, color: Colors.brown),
                                 ),
-                              );
-                            } else {
-                              final wishlist = snapshot.data!;
-                              return ListView.builder(
+                              )
+                            : ListView.builder(
                                 itemCount: wishlist.length,
                                 itemBuilder: (context, index) {
                                   final item = wishlist[index];
@@ -334,14 +416,25 @@ class _MyHomePageState extends State<MyHomePage> {
                                         fit: BoxFit.cover,
                                       ),
                                       title: Text(item.fields.name),
+                                      trailing: IconButton(
+                                        icon: Icon(Icons.remove_circle_outline, color: Colors.red),
+                                        onPressed: () async {
+                                          await removeFromWishlist(item);
+
+                                          setState(() {
+                                            wishlist.removeAt(index);
+                                          });
+                                          saveWishlist();
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Product removed from wishlist')),
+                                          );
+                                        },
+                                      ),
                                     ),
                                   );
                                 },
-                              );
-                            }
-                          },
-                        ),
-                      ),
+                              ),
+                      )
                     ],
                   ),
                 ),
