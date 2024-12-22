@@ -39,6 +39,7 @@ dependencies:
   flutter_svg: ^2.0.16
   google_fonts: ^6.2.1
   http: ^1.2.2
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:

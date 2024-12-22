@@ -1,15 +1,21 @@
 import 'package:bite_tracker_mobile/feature/main/pages/footer.dart';
 import 'package:bite_tracker_mobile/feature/mybites/models/mybites_data.dart';
 import 'package:bite_tracker_mobile/feature/mybites/screens/product_wishlist.dart';
+import 'package:bite_tracker_mobile/feature/main/pages/menu.dart';
+import 'package:bite_tracker_mobile/main.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MyBitesApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyBitesApp extends StatelessWidget {
+  const MyBitesApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -59,15 +65,89 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<MyBitesData> wishlist = [];
 
+  @override
+  void initState() {
+    super.initState();
+    loadWishlist(context.read<CookieRequest>());
+  }
+
+  Future<void> saveWishlist() async {
+    final prefs = await SharedPreferences.getInstance();
+    final wishlistJson =
+        wishlist.map((item) => jsonEncode(item.toJson())).toList();
+    await prefs.setStringList('wishlist', wishlistJson);
+  }
+
+  List<MyBitesData> parseWishlist(String responseBody) {
+    final List<dynamic> parsed = jsonDecode(responseBody);
+    return parsed.map((json) => MyBitesData.fromJson(json)).toList();
+  }
+
+  Future<void> loadWishlist(CookieRequest request) async {
+    if (!request.loggedIn) {
+      return;
+    }
+
+    try {
+      final response = await request.get('http://127.0.0.1:8000/mybites/flutter/view/');
+      print(response);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        if (data['wishlist'] != null) {
+          final List<MyBitesData> fetchedWishlist = parseWishlist(jsonEncode(data['wishlist']));
+          setState(() {
+            wishlist.clear();
+            wishlist.addAll(fetchedWishlist);
+          });
+        }
+      }
+    } catch (e) {
+
+    }
+  }
+
+  Future<List<MyBitesData>> loadWishlistFuture(CookieRequest request) async {
+    if (!request.loggedIn) {
+      throw Exception('User not logged in');
+    }
+
+    try {
+      final response = await request.get('http://127.0.0.1:8000/mybites/flutter/view/');
+      if (response['wishlist'] != null) {
+        final List<MyBitesData> wishlist =
+            (response['wishlist'] as List).map((json) => MyBitesData.fromJson(json)).toList();
+        return wishlist;
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Failed to fetch wishlist: $e');
+    }
+  }
+
   void updateWishlist(List<MyBitesData> newWishlist) {
     setState(() {
       wishlist.clear();
       wishlist.addAll(newWishlist);
     });
+    saveWishlist();
   }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
+    if (!request.loggedIn) {
+      return Scaffold(
+        body: Center(
+          child: Text(
+            'Please log in to access MyBites',
+            style: GoogleFonts.poppins(fontSize: 18, color: Colors.red),
+          ),
+        ),
+      );
+    }
+
+    
     final mediaQuery = MediaQuery.of(context);
     final isLandscape = mediaQuery.orientation == Orientation.landscape;
 
@@ -141,12 +221,12 @@ class _MyHomePageState extends State<MyHomePage> {
                             updateWishlist(newWishlist);
                           }
                         } else {
-                          ScaffoldMessenger.of(context)
-                            ..hideCurrentSnackBar()
-                            ..showSnackBar(
-                              SnackBar(
-                                  content: Text("Anda menekan ${item.name}!")),
-                            );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MyApp(),
+                            ),
+                          );
                         }
                       },
                       child: Container(
@@ -219,52 +299,48 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 8),
                       SizedBox(
                         height: mediaQuery.size.height * 0.4,
-                        child: wishlist.isNotEmpty
-                            ? ListView.builder(
+                        child: FutureBuilder<List<MyBitesData>>(
+                          future: loadWishlistFuture(request),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Text(
+                                  'Error: ${snapshot.error}',
+                                  style: GoogleFonts.poppins(fontSize: 18, color: Colors.red),
+                                ),
+                              );
+                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return Center(
+                                child: Text(
+                                  'Your Bites is empty',
+                                  style: GoogleFonts.poppins(fontSize: 18, color: Colors.brown),
+                                ),
+                              );
+                            } else {
+                              final wishlist = snapshot.data!;
+                              return ListView.builder(
                                 itemCount: wishlist.length,
                                 itemBuilder: (context, index) {
                                   final item = wishlist[index];
                                   return Card(
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
+                                    margin: const EdgeInsets.symmetric(vertical: 8.0),
                                     child: ListTile(
                                       leading: Image.network(
                                         item.fields.image,
                                         width: 50,
                                         height: 50,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (context, error,
-                                            stackTrace) {
-                                          return Icon(Icons.broken_image,
-                                              size: 50);
-                                        },
                                       ),
-                                      title: Text(
-                                        item.fields.name,
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      subtitle: Text(
-                                        item.fields.description,
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 14),
-                                      ),
+                                      title: Text(item.fields.name),
                                     ),
                                   );
                                 },
-                              )
-                            : Center(
-                                child: Text(
-                                  'Your Bites is empty!',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.brown.shade600,
-                                  ),
-                                ),
-                              ),
+                              );
+                            }
+                          },
+                        ),
                       ),
                     ],
                   ),

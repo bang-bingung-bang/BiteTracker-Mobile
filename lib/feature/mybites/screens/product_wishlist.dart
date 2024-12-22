@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:bite_tracker_mobile/feature/mybites/models/mybites_data.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class ProductsWishlist extends StatefulWidget {
   final List<MyBitesData> wishlist;
@@ -22,21 +25,26 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
   }
 
   Future<List<MyBitesData>> fetchMyBitesData() async {
-    final url = 'http://127.0.0.1:8000/mybites/json/'; // Ganti dengan URL API Django Anda
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        return myBitesDataFromJson(response.body);
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (error) {
-      throw Exception('Error fetching data: $error');
+  final url = Uri.parse('http://127.0.0.1:8000/mybites/json/');
+
+  final response = await http.get(url);
+  try {
+
+    if (response.statusCode == 200) {
+      return myBitesDataFromJson(response.body);
+    } else {
+      throw Exception('Failed to load data: ${response.statusCode}');
     }
+  } on http.ClientException catch (e) {
+    throw Exception('Connection error: $e');
+  } catch (e) {
+    throw Exception('Unexpected error: $e');
+  }
   }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -168,9 +176,26 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
                             Center(
                               child: ElevatedButton.icon(
                                 onPressed: () {
-                                  setState(() {
-                                    if (!widget.wishlist.contains(item)) {
-                                      widget.wishlist.add(item);
+                                  setState (() async {
+                                    final product_id = item.pk;
+                                    final response = await request.postJson(
+                                      "http://127.0.0.1:8000/mybites/flutter/add/$product_id/",
+                                      jsonEncode(product_id)
+                                    );
+                                    if (context.mounted) {
+                                      if (response['status'] == 'success') {
+                                        ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                            content: Text("MyBites berhasil disimpan!"),
+                                          ));
+                                        Navigator.pop(context);
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                            content:
+                                              Text("Terdapat kesalahan, silakan coba lagi."),
+                                          ));
+                                      }
                                     }
                                   });
                                   ScaffoldMessenger.of(context).showSnackBar(
