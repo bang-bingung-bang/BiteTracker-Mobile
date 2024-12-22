@@ -17,14 +17,9 @@ class MyApp extends StatelessWidget {
         CookieRequest request = CookieRequest();
         return request;
       },
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSwatch(
-            primarySwatch: Colors.deepPurple,
-            ).copyWith(secondary: Colors.deepPurple[400]),      
-          ),
-        home: const LoginPage(),
+      child: const MaterialApp(
+        title: 'Bite Tracker',
+        home: LoginPage(),
       ),
     );
   }

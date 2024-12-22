@@ -3,7 +3,6 @@ import 'package:bite_tracker_mobile/feature/tracker_bites/pages/tracker_bites_fo
 import 'package:bite_tracker_mobile/feature/tracker_bites/pages/tracker_bites_list.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:bite_tracker_mobile/core/assets.dart';
@@ -88,11 +87,12 @@ Future<InfoData> _fetchData(CookieRequest request) async {
       backgroundColor:const Color.fromARGB(255, 233, 225, 225),
       body: Stack(
         children: [
-          SvgPicture.asset(
-            Assets.svg.trackerbites,
+          Image.asset(
+            'assets/images/bitetracker_background2.png',
             fit: BoxFit.cover,
+            height: double.infinity,
             width: double.infinity,
-            height: 50,
+            alignment: Alignment.center,
           ),
           SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
@@ -229,7 +229,7 @@ Future<InfoData> _fetchData(CookieRequest request) async {
                                     value: data.totalCalories > 2500 ? 1 : data.totalCalories / 2500,
                                     strokeWidth: 10,
                                     strokeCap: StrokeCap.round,
-                                    backgroundColor: Colors.grey,
+                                    backgroundColor: const Color.fromARGB(255, 191, 191, 191),
                                     valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFB99867)),
                                   ),
                                 ),
@@ -264,7 +264,7 @@ Future<InfoData> _fetchData(CookieRequest request) async {
                                       width: 5,
                                     ),
                                     Text(
-                                      'cal',
+                                      'calories',
                                       style: GoogleFonts.poppins(
                                         textStyle: const TextStyle(
                                           fontSize: 16,
@@ -297,10 +297,10 @@ Future<InfoData> _fetchData(CookieRequest request) async {
                             children: [ 
                               Row(
                                 children: [
-                                  const Icon(
-                                    Icons.set_meal_sharp,
-                                    color: Colors.blue,
-                                    size: 50,
+                                  Image.asset(
+                                    Assets.images.breakfast,
+                                    width: 50,
+                                    height: 50,
                                   ),
                                   const SizedBox(
                                     width: 20,
@@ -322,17 +322,33 @@ Future<InfoData> _fetchData(CookieRequest request) async {
                                       const SizedBox(
                                         height: 10,
                                       ),
-                                      SizedBox(
-                                        width: 50,
-                                        child: LinearProgressIndicator(
-                                          value: data.mealCounts.breakfast >= 1 ? 1 : 0,
-                                          borderRadius: const BorderRadius.all(
-                                            Radius.circular(5),
+                                      Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 50,
+                                            child: LinearProgressIndicator(
+                                              value: data.mealCounts.breakfast >= 1 ? 1 : 0,
+                                              borderRadius: const BorderRadius.all(
+                                                Radius.circular(5),
+                                              ),
+                                              backgroundColor: const Color.fromARGB(255, 208, 208, 208),
+                                              color: data.mealCounts.breakfast == 1 ? const Color(0xFFB99867) : Colors.red,
+                                              minHeight: 5,
+                                            ),
                                           ),
-                                          backgroundColor: Colors.grey,
-                                          color: data.mealCounts.breakfast == 1 ? const Color(0xFFB99867) : Colors.red,
-                                          minHeight: 5,
-                                        ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            '${data.mealCounts.breakfast.toString()} bites',
+                                            style: GoogleFonts.poppins(
+                                              textStyle: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       )
                                     ],
                                   ),
@@ -369,10 +385,10 @@ Future<InfoData> _fetchData(CookieRequest request) async {
                             children: [ 
                               Row(
                                 children: [
-                                  const Icon(
-                                    Icons.set_meal_sharp,
-                                    color: Colors.blue,
-                                    size: 50,
+                                  Image.asset(
+                                    Assets.images.lunch,
+                                    width: 50,
+                                    height: 50,
                                   ),
                                   const SizedBox(
                                     width: 20,
@@ -386,7 +402,7 @@ Future<InfoData> _fetchData(CookieRequest request) async {
                                         style: GoogleFonts.poppins(
                                           textStyle: const TextStyle(
                                             fontSize: 20,
-                                            fontWeight: FontWeight.w300,
+                                            fontWeight: FontWeight.w500,
                                             color: Colors.black,
                                           ),
                                         ),
@@ -394,17 +410,33 @@ Future<InfoData> _fetchData(CookieRequest request) async {
                                       const SizedBox(
                                         height: 10,
                                       ),
-                                      SizedBox(
-                                        width: 50,
-                                        child: LinearProgressIndicator(
-                                          value: data.mealCounts.lunch >= 1 ? 1 : 0,
-                                          borderRadius: const BorderRadius.all(
-                                            Radius.circular(5),
+                                      Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 50,
+                                            child: LinearProgressIndicator(
+                                              value: data.mealCounts.lunch >= 1 ? 1 : 0,
+                                              borderRadius: const BorderRadius.all(
+                                                Radius.circular(5),
+                                              ),
+                                              backgroundColor: const Color.fromARGB(255, 208, 208, 208),
+                                              color: data.mealCounts.lunch == 1 ? const Color(0xFFB99867) : Colors.red,
+                                              minHeight: 5,
+                                            ),
                                           ),
-                                          backgroundColor: Colors.grey,
-                                          color: data.mealCounts.lunch == 1 ? const Color(0xFFB99867) : Colors.red,
-                                          minHeight: 5,
-                                        ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            '${data.mealCounts.lunch.toString()} bites',
+                                            style: GoogleFonts.poppins(
+                                              textStyle: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       )
                                     ],
                                   ),
@@ -441,10 +473,10 @@ Future<InfoData> _fetchData(CookieRequest request) async {
                             children: [ 
                               Row(
                                 children: [
-                                  const Icon(
-                                    Icons.set_meal_sharp,
-                                    color: Colors.blue,
-                                    size: 50,
+                                  Image.asset(
+                                    Assets.images.dinner,
+                                    width: 50,
+                                    height: 50,
                                   ),
                                   const SizedBox(
                                     width: 20,
@@ -458,7 +490,7 @@ Future<InfoData> _fetchData(CookieRequest request) async {
                                         style: GoogleFonts.poppins(
                                           textStyle: const TextStyle(
                                             fontSize: 20,
-                                            fontWeight: FontWeight.w700,
+                                            fontWeight: FontWeight.w500,
                                             color: Colors.black,
                                           ),
                                         ),
@@ -466,17 +498,33 @@ Future<InfoData> _fetchData(CookieRequest request) async {
                                       const SizedBox(
                                         height: 10,
                                       ),
-                                      SizedBox(
-                                        width: 50,
-                                        child: LinearProgressIndicator(
-                                          value: data.mealCounts.dinner >= 1 ? 1 : 0,
-                                          borderRadius: const BorderRadius.all(
-                                            Radius.circular(5),
+                                      Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 50,
+                                            child: LinearProgressIndicator(
+                                              value: data.mealCounts.dinner >= 1 ? 1 : 0,
+                                              borderRadius: const BorderRadius.all(
+                                                Radius.circular(5),
+                                              ),
+                                              backgroundColor: const Color.fromARGB(255, 208, 208, 208),
+                                              color: data.mealCounts.dinner == 1 ? const Color(0xFFB99867) : Colors.red,
+                                              minHeight: 5,
+                                            ),
                                           ),
-                                          backgroundColor: Colors.grey,
-                                          color: data.mealCounts.dinner == 1 ? const Color(0xFFB99867) : Colors.red,
-                                          minHeight: 5,
-                                        ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            '${data.mealCounts.dinner.toString()} bites',
+                                            style: GoogleFonts.poppins(
+                                              textStyle: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       )
                                     ],
                                   ),
@@ -513,10 +561,10 @@ Future<InfoData> _fetchData(CookieRequest request) async {
                             children: [ 
                               Row(
                                 children: [
-                                  const Icon(
-                                    Icons.set_meal_sharp,
-                                    color: Colors.blue,
-                                    size: 50,
+                                  Image.asset(
+                                    Assets.images.snacks,
+                                    width: 50,
+                                    height: 50,
                                   ),
                                   const SizedBox(
                                     width: 20,
@@ -530,7 +578,7 @@ Future<InfoData> _fetchData(CookieRequest request) async {
                                         style: GoogleFonts.poppins(
                                           textStyle: const TextStyle(
                                             fontSize: 20,
-                                            fontWeight: FontWeight.w900,
+                                            fontWeight: FontWeight.w500,
                                             color: Colors.black,
                                           ),
                                         ),
@@ -538,17 +586,33 @@ Future<InfoData> _fetchData(CookieRequest request) async {
                                       const SizedBox(
                                         height: 10,
                                       ),
-                                      SizedBox(
-                                        width: 50,
-                                        child: LinearProgressIndicator(
-                                          value: data.mealCounts.snack >= 1 ? 1 : 0,
-                                          borderRadius: const BorderRadius.all(
-                                            Radius.circular(5),
+                                      Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 50,
+                                            child: LinearProgressIndicator(
+                                              value: data.mealCounts.snack >= 1 ? 1 : 0,
+                                              borderRadius: const BorderRadius.all(
+                                                Radius.circular(5),
+                                              ),
+                                              backgroundColor: const Color.fromARGB(255, 208, 208, 208),
+                                              color: data.mealCounts.snack == 1 ? const Color(0xFFB99867) : Colors.red,
+                                              minHeight: 5,
+                                            ),
                                           ),
-                                          backgroundColor: Colors.grey,
-                                          color: data.mealCounts.snack == 1 ? const Color(0xFFB99867) : Colors.red,
-                                          minHeight: 5,
-                                        ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            '${data.mealCounts.snack.toString()} bites',
+                                            style: GoogleFonts.poppins(
+                                              textStyle: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       )
                                     ],
                                   ),
