@@ -145,6 +145,7 @@ class _ShareBitesCardState extends State<ShareBitesCard> {
         borderRadius: BorderRadius.circular(12),
         side: const BorderSide(color: Colors.grey, width: 0.5),
       ),
+      color: Colors.white,
       child: Stack(
         children: [
           Column(
