@@ -7,15 +7,13 @@ import 'package:bite_tracker_mobile/feature/edit_bites/models/product.dart';
 
 class EditBitesData {
   final CookieRequest request;
-  static const String baseUrl = 'http://10.0.2.2:8000/productbites';
+  static const String baseUrl = 'http://127.0.0.1:8000/productbites';
 
   EditBitesData({required this.request});
 
   Future<List<Product>> getProducts() async {
     try {
-      print('Fetching products...');
       final response = await request.get('$baseUrl/get_product_json/');
-      print('API Response: $response');
       
       if (response != null) {
         List<dynamic> jsonList = response;
@@ -41,7 +39,6 @@ class EditBitesData {
               ),
             ));
           } catch (e) {
-            print('Error parsing product: $e');
           }
         }
         return products;
@@ -49,16 +46,13 @@ class EditBitesData {
         throw Exception('Failed to load products from API.');
       }
     } catch (e) {
-      print('Error fetching from API: $e');
       rethrow;
     }
   }
 
   Future<Product> getProductDetail(int id) async {
     try {
-      print('Fetching product details...');
       final response = await request.get('$baseUrl/get_product_json/');
-      print('Product Detail Response: $response');
 
       if (response != null && response is List && response.isNotEmpty) {
         var productItem = response.firstWhere((item) => item['pk'] == id, orElse: () => null);
@@ -85,7 +79,6 @@ class EditBitesData {
       }
       throw Exception('Product not found');
     } catch (e) {
-      print('Error fetching detail: $e');
       rethrow;
     }
   }
@@ -112,7 +105,6 @@ class EditBitesData {
           }
         }),
       );
-      print('Create Response: $response');
 
       if (response['status'] == 'success') {
         return response['message'];
@@ -120,7 +112,6 @@ class EditBitesData {
         throw Exception(response['message'] ?? 'Failed to create product.');
       }
     } catch (e) {
-      print('Error creating product: $e');
       rethrow;
     }
   }
@@ -147,7 +138,6 @@ class EditBitesData {
           }
         }),
       );
-      print('Update Response: $response');
 
       if (response['status'] == 'success') {
         return response['message'];
@@ -155,7 +145,6 @@ class EditBitesData {
         throw Exception(response['message'] ?? 'Failed to update product.');
       }
     } catch (e) {
-      print('Error updating product: $e');
       rethrow;
     }
   }
@@ -170,7 +159,6 @@ class EditBitesData {
         '$baseUrl/mobile/$id/delete/',
         {},
       );
-      print('Delete Response: $response');
 
       if (response['status'] == 'success') {
         return response['message'];
@@ -178,7 +166,6 @@ class EditBitesData {
         throw Exception(response['message'] ?? 'Failed to delete product.');
       }
     } catch (e) {
-      print('Error deleting product: $e');
       rethrow;
     }
   }
