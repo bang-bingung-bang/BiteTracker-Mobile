@@ -2,7 +2,6 @@ import 'package:bite_tracker_mobile/core/assets.dart';
 import 'package:bite_tracker_mobile/feature/main/pages/footer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:bite_tracker_mobile/feature/main/widgets/left.drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -38,7 +37,6 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      drawer: const LeftDrawer(),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -46,10 +44,10 @@ class _HomePageState extends State<HomePage> {
               height: MediaQuery.of(context).size.height * 0.4,
               decoration: BoxDecoration(
                 color: Colors.grey[300],
-                // image: const DecorationImage(
-                //   AssetImage(Assets.images.background),
-                //   fit: BoxFit.cover,
-                // ),
+                image: DecorationImage(
+                  image: AssetImage(Assets.images.background),
+                  fit: BoxFit.cover,
+                ),
               ),
               child: Stack(
                 children: [
@@ -70,7 +68,8 @@ class _HomePageState extends State<HomePage> {
                       'Track Your Bites,\nTailor Your Eats!',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
-                        fontSize: 36,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
                         color: Colors.white,
                         height: 1.3,
                       ),

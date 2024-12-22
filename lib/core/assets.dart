@@ -17,5 +17,6 @@ class _ImageAssets {
   String get lunch => '$_basePath/trackerbites_icon2.png';
   String get dinner => '$_basePath/trackerbites_icon3.png';
   String get snacks => '$_basePath/trackerbites_icon4.png';
-  String get background => '$_basePath/background.svg';
+  String get logo => '$_basePath/logo2.png';
+  String get background => '$_basePath/main_background.png';
 }
