@@ -1,3 +1,4 @@
+import 'package:bite_tracker_mobile/feature/main/pages/menu.dart';
 import 'package:bite_tracker_mobile/feature/sharebites/models/sharebites_data.dart';
 import 'package:bite_tracker_mobile/feature/sharebites/screens/create_sharebites.dart';
 import 'package:bite_tracker_mobile/feature/sharebites/widgets/sharebites_card.dart';
@@ -16,10 +17,7 @@ class ShareBitesScreen extends StatefulWidget {
 
 class _ShareBitesScreenState extends State<ShareBitesScreen> {
   Future<List<ShareBites>> fetchShareBites(CookieRequest request) async {
-    // Make sure to include trailing slash
     final response = await request.get('http://localhost:8000/sharebites/json/');
-    
-    // Convert response to ShareBites objects
     List<ShareBites> listShareBites = [];
     for (var d in response) {
       if (d != null) {
@@ -29,7 +27,6 @@ class _ShareBitesScreenState extends State<ShareBitesScreen> {
     return listShareBites;
   }
 
-  // DELETE request using http package
   Future<void> deletePost(int postId) async {
     try {
       final response = await http.delete(
@@ -38,23 +35,17 @@ class _ShareBitesScreenState extends State<ShareBitesScreen> {
 
       if (response.statusCode == 204) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Deleted successfully'),
-          ),
+          const SnackBar(content: Text('Deleted successfully')),
         );
-        setState(() {}); // Refresh the UI after deletion
+        setState(() {});
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to delete post'),
-          ),
+          const SnackBar(content: Text('Failed to delete post')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to delete post: $e'),
-        ),
+        SnackBar(content: Text('Failed to delete post: $e')),
       );
     }
   }
@@ -63,53 +54,91 @@ class _ShareBitesScreenState extends State<ShareBitesScreen> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
     return Scaffold(
+      // Mengubah AppBar dengan background hitam
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back), // Ikon back
+          color: Colors.white,                // Warna ikon
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const MyHomePage()),
+            );
+          },
+        ),
         title: const Text(
           'ShareBites',
           style: TextStyle(
-            color: Colors.black,
+            color: Colors.white,  // Mengubah warna teks menjadi putih
             fontWeight: FontWeight.bold,
+            fontSize: 24,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF533A2E),  // Mengubah background menjadi hitam
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),  // Mengubah warna ikon menjadi putih
       ),
-      body: FutureBuilder(
-        future: fetchShareBites(request),
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            if (!snapshot.hasData) {
-              return const Column(
-                children: [
-                  Text(
-                    'No posts available in ShareBites.',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Color(0xFF533A2E),
-                    ),
+      body: Column(
+        children: [
+          // Header section dengan background putih
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            color: Colors.white,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Calling all BiteTracker fellows! Show off your favorite eats and inspire others with your delicious finds! 🍽️',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87,
+                    height: 1.5,
                   ),
-                  SizedBox(height: 8),
-                ],
-              );
-            } else {
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  final post = snapshot.data![index]; // Define 'post' here
-                  return ShareBitesCard(
-                    post: post,
-                    onDelete: () {
-                      deletePost(post.pk); // Pass post.pk here to delete the post
-                    },
-                  );
-                },
-              );
-            }
-          }
-        },
+                ),
+              ],
+            ),
+          ),
+          // List of posts
+          Expanded(
+            child: FutureBuilder(
+              future: fetchShareBites(request),
+              builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.data == null) {
+                  return const Center(child: CircularProgressIndicator());
+                } else {
+                  if (!snapshot.hasData) {
+                    return const Column(
+                      children: [
+                        Text(
+                          'No posts available in ShareBites.',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Color(0xFF533A2E),
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                      ],
+                    );
+                  } else {
+                    return ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final post = snapshot.data![index];
+                        return ShareBitesCard(
+                          post: post,
+                          onDelete: () => deletePost(post.pk),
+                          currentUserId: 2,
+                        );
+                      },
+                    );
+                  }
+                }
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -121,7 +150,11 @@ class _ShareBitesScreenState extends State<ShareBitesScreen> {
           ).then((_) => setState(() {}));
         },
         backgroundColor: const Color(0xFF533A2E),
-        child: const Icon(Icons.add),
+        shape: const CircleBorder(),
+        child: const Icon(
+          Icons.add_rounded,
+          color: Colors.white,
+        ),
       ),
     );
   }

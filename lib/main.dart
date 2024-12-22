@@ -1,4 +1,6 @@
 import 'package:bite_tracker_mobile/feature/authentication/pages/login.dart';
+import 'package:bite_tracker_mobile/feature/main/pages/menu.dart';
+import 'package:bite_tracker_mobile/feature/sharebites/screens/sharebites_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:bite_tracker_mobile/feature/edit_bites/screens/main/pages/menu.dart';  // Import EditBitesMenu
 import 'package:pbp_django_auth/pbp_django_auth.dart';

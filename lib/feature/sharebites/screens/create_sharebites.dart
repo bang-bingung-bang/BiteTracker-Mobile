@@ -98,7 +98,7 @@ class _CreateShareBitesScreenState extends State<CreateShareBitesScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              DropdownButtonFormField(
+              DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'Calorie Content',
                   border: OutlineInputBorder(),
@@ -115,7 +115,7 @@ class _CreateShareBitesScreenState extends State<CreateShareBitesScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              DropdownButtonFormField(
+              DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'Sugar Content',
                   border: OutlineInputBorder(),
@@ -132,7 +132,7 @@ class _CreateShareBitesScreenState extends State<CreateShareBitesScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              DropdownButtonFormField(
+              DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'Diet Type',
                   border: OutlineInputBorder(),
@@ -156,54 +156,53 @@ class _CreateShareBitesScreenState extends State<CreateShareBitesScreen> {
                 ),
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                      try {
-                          // Kirim data ke Django dan tunggu respons
-                          final response = await request.postJson(
-                              "http://127.0.0.1:8000/sharebites/create-flutter/",
-                              jsonEncode(<String, dynamic>{ // Use dynamic to handle mixed types
-                                  'user_id' : 2, // Keep the integer as is
-                                  'title': _title,
-                                  'content': _content,
-                                  'image': _image,
-                                  'calorie_content': _calorieContent,
-                                  'sugar_content': _sugarContent,
-                                  'diet_type': _dietType,
-                              }),
+                    try {
+                      final response = await request.postJson(
+                        "http://127.0.0.1:8000/sharebites/create-flutter/",
+                        jsonEncode(<String, dynamic>{
+                          'user_id': 2,
+                          'title': _title,
+                          'content': _content,
+                          'image': _image,
+                          'calorie_content': _calorieContent,
+                          'sugar_content': _sugarContent,
+                          'diet_type': _dietType,
+                        }),
+                      );
+
+                      if (context.mounted) {
+                        if (response['status'] == 'success') {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Uploaded Successfully"),
+                            ),
                           );
-
-
-                          if (context.mounted) {
-                              if (response['status'] == 'success') {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text("Post baru berhasil dibuat!"),
-                                      ),
-                                  );
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const ShareBitesScreen()),
-                                  );
-                              } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(response['message'] ?? 
-                                              "Terdapat kesalahan, silakan coba lagi."),
-                                      ),
-                                  );
-                              }
-                          }
-                      } catch (e) {
-                          if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text("Error: $e"),
-                                      backgroundColor: Colors.red,
-                                  ),
-                              );
-                          }
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const ShareBitesScreen()),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(response['message'] ??
+                                  "Terdapat kesalahan, silakan coba lagi."),
+                            ),
+                          );
+                        }
                       }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Error: $e"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
                   }
-              },
+                },
                 child: const Text(
                   'Create Post',
                   style: TextStyle(fontSize: 16),
