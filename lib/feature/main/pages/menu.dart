@@ -1,125 +1,274 @@
+import 'package:bite_tracker_mobile/feature/mybites/models/mybites_data.dart';
+import 'package:bite_tracker_mobile/feature/mybites/screens/product_wishlist.dart';
 import 'package:flutter/material.dart';
-import 'package:bite_tracker_mobile/feature/main/widgets/left.drawer.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class MyHomePage extends StatelessWidget {
-  final String npm = '5000000000'; // NPM
-  final String name = 'Gedagedi Gedagedago'; // Nama
-  final String className = 'PBP S'; // Kelas
+void main() {
+  runApp(const MyApp());
+}
 
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'MyBites',
+      theme: ThemeData(
+        colorScheme: ColorScheme(
+          primary: Colors.brown,
+          secondary: Colors.brown.shade800,
+          surface: Colors.white,
+          background: Colors.yellow[50]!,
+          error: Colors.red,
+          onPrimary: Colors.black,
+          onSecondary: Colors.black,
+          onSurface: Colors.black,
+          onBackground: Colors.black,
+          onError: Colors.white,
+          brightness: Brightness.light,
+        ),
+        useMaterial3: true,
+      ),
+      home: MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final List<ItemHomepage> items = [
+    ItemHomepage("MyBites!", Icons.favorite),
+    ItemHomepage("TrackerBites!", Icons.track_changes),
+  ];
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final isLandscape = mediaQuery.orientation == Orientation.landscape;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Geda Gedi',
-          style: TextStyle(
+        title: Text(
+          'MyBites',
+          style: GoogleFonts.lobster(
             color: Colors.white,
-            fontWeight: FontWeight.bold,
+            fontSize: 28,
           ),
         ),
-        // Warna latar belakang AppBar diambil dari skema warna tema aplikasi.
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        iconTheme: const IconThemeData(color: Colors.orange),
+        centerTitle: true,
+        backgroundColor: Colors.brown.shade800,
       ),
-      // Drawer adalah menu navigasi yang muncul saat tombol menu ditekan.
-      drawer: const LeftDrawer(),
-      // Body halaman dengan padding di sekelilingnya.
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        // Menyusun widget secara vertikal dalam sebuah kolom.
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Row untuk menampilkan 3 InfoCard secara horizontal.
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                InfoCard(title: 'NPM', content: npm),
-                InfoCard(title: 'Name', content: name),
-                InfoCard(title: 'Class', content: className),
-              ],
-            ),
-
-            // Memberikan jarak vertikal 16 unit.
-            const SizedBox(height: 16.0),
-
-            // Menempatkan widget berikutnya di tengah halaman.
-            Center(
-              child: Column(
-                // Menyusun teks dan grid item secara vertikal.
-
-                children: [
-                  // Menampilkan teks sambutan dengan gaya tebal dan ukuran 18.
-                  const Padding(
-                    padding: EdgeInsets.only(top: 16.0),
-                    child: Text(
-                      'Geda Gedago', 
-                      style: TextStyle(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.brown.shade100, Colors.brown.shade300],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: isLandscape ? 8 : 16,
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'Welcome to MyBites!',
+                      style: GoogleFonts.poppins(
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        fontSize: 18.0,
+                        color: Colors.brown.shade800,
                       ),
                     ),
-                  ),
-
-                  // Grid untuk menampilkan ItemCard dalam bentuk grid 3 kolom.
-                  GridView.count(
-                    primary: true,
-                    padding: const EdgeInsets.all(20),
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    crossAxisCount: 3,
-                    // Agar grid menyesuaikan tinggi kontennya.
-                    shrinkWrap: true,
-
-                    // Menampilkan ItemCard untuk setiap item dalam list items.
-                    // children: items.map((ItemHomepage item) {
-                    //   return ItemCard(item);
-                    // }).toList(),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text(
+                      'Discover and track your favorite snacks.',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        color: Colors.brown.shade600,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: items.map((item) {
+                    return GestureDetector(
+                      onTap: () async {
+                        if (item.name == "MyBites!") {
+                          
+                        } else if (item.name == "TrackerBites!") {
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                  content: Text("Anda menekan ${item.name}!")),
+                            );
+                        }
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.brown.shade200,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.brown.shade100,
+                              offset: const Offset(0, 3),
+                              blurRadius: 6,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              item.icon,
+                              size: 40,
+                              color: Colors.brown.shade900,
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Text(
+                                item.name,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  color: Colors.brown.shade800,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.brown.shade50,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.brown.shade100,
+                      offset: const Offset(0, -2),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Your Bites!',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.brown.shade800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class InfoCard extends StatelessWidget {
-  // Kartu informasi yang menampilkan title dan content.
+class ItemHomepage {
+  final String name;
+  final IconData icon;
+  ItemHomepage(this.name, this.icon);
+}
 
-  final String title;  // Judul kartu.
-  final String content;  // Isi kartu.
+class ItemCard extends StatelessWidget {
+  final ItemHomepage item;
+  final List<MyBitesData> wishlist;
+  final Function(List<MyBitesData>) updateWishlist;
 
-  const InfoCard({super.key, required this.title, required this.content});
+  const ItemCard({
+    super.key,
+    required this.item,
+    required this.wishlist,
+    required this.updateWishlist,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      // Membuat kotak kartu dengan bayangan dibawahnya.
-      elevation: 2.0,
-      child: Container(
-        // Mengatur ukuran dan jarak di dalam kartu.
-        width: MediaQuery.of(context).size.width / 3.5, // menyesuaikan dengan lebar device yang digunakan.
-        padding: const EdgeInsets.all(16.0),
-        // Menyusun title dan content secara vertikal.
-        child: Column(
-          children: [
-            Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+    return Material(
+      color: Theme.of(context).colorScheme.secondary,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: () async {
+          if (item.name == "Wanna see product list?") {
+            final newWishlist = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProductsWishlist(
+                  wishlist: List.from(wishlist),
+                ),
+              ),
+            );
+
+            if (newWishlist != null && newWishlist is List<MyBitesData>) {
+              updateWishlist(newWishlist);
+            }
+          } else {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(content: Text("Anda menekan tombol ${item.name}!")),
+              );
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  item.icon,
+                  color: Colors.white,
+                  size: 30.0,
+                ),
+                const Padding(padding: EdgeInsets.all(3)),
+                Text(
+                  item.name,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 8.0),
-            Text(content),
-          ],
+          ),
         ),
       ),
     );
   }
 }
-
