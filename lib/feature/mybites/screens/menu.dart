@@ -7,6 +7,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyBitesApp());
@@ -48,12 +49,41 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<MyBitesData> wishlist = [];
+  List<MyBitesData> wishlist = [];
 
-  @override
-  void initState() {
-    super.initState();
-    loadWishlist(context.read<CookieRequest>());
+  void updateWishlist(List<MyBitesData> newWishlist) {
+    setState(() {
+      wishlist.clear();
+      wishlist.addAll(newWishlist);
+    });
+  }
+
+  Future<bool> _removeProductFromWishlist(MyBitesData product) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:8000/mybites/flutter/remove'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Cookie': context.read<CookieRequest>().cookie,
+        },
+        body: jsonEncode({
+          'product_id': product.pk,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        if (responseBody['wishlist'] != null) {
+          final List<MyBitesData> updatedWishlist = 
+              (responseBody['wishlist'] as List).map((json) => MyBitesData.fromJson(json)).toList();
+          updateWishlist(updatedWishlist);
+          return true;
+        }
+      }
+    } catch (e) {
+      print('Error removing product: $e');
+    }
+    return false;
   }
 
   Future<void> saveWishlist() async {
@@ -63,31 +93,60 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.setStringList('wishlist', wishlistJson);
   }
 
+  @override
+  void initState() {
+    super.initState();
+    loadWishlist(context.read<CookieRequest>());
+  }
+
+  void addToWishlist(MyBitesData product) async {
+    bool success = await _addProductToWishlist(product);
+
+    if (success) {
+      setState(() {
+        wishlist.add(product);
+      });
+      saveWishlist();
+      loadWishlist(context.read<CookieRequest>());
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add product to wishlist')),
+      );
+    }
+  }
+
+  Future<bool> _addProductToWishlist(MyBitesData product) async {
+    try {
+      await Future.delayed(Duration(seconds: 1));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   List<MyBitesData> parseWishlist(String responseBody) {
     final List<dynamic> parsed = jsonDecode(responseBody);
     return parsed.map((json) => MyBitesData.fromJson(json)).toList();
   }
 
   Future<void> loadWishlist(CookieRequest request) async {
-    if (!request.loggedIn) {
-      return;
-    }
+    if (!request.loggedIn) return;
 
     try {
       final response = await request.get('http://127.0.0.1:8000/mybites/flutter/view/');
-      print(response);
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-        if (data['wishlist'] != null) {
-          final List<MyBitesData> fetchedWishlist = parseWishlist(jsonEncode(data['wishlist']));
-          setState(() {
-            wishlist.clear();
-            wishlist.addAll(fetchedWishlist);
-          });
-        }
+      if (response['wishlist'] != null) {
+        final List<MyBitesData> fetchedWishlist = 
+            (response['wishlist'] as List).map((json) => MyBitesData.fromJson(json)).toList();
+        setState(() {
+          wishlist.clear();
+          wishlist.addAll(fetchedWishlist);
+        });
+        saveWishlist();
       }
     } catch (e) {
-
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load wishlist: $e')),
+      );
     }
   }
 
@@ -109,13 +168,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void updateWishlist(List<MyBitesData> newWishlist) {
-    setState(() {
-      wishlist.clear();
-      wishlist.addAll(newWishlist);
-    });
-    saveWishlist();
-  }
   final List<ItemHomepage> items = [
     ItemHomepage("Let's go back to main page!", Icons.add_home_work_rounded),
     ItemHomepage("Wanna see product list?", Icons.shopping_cart),
@@ -288,28 +340,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 8),
                       SizedBox(
                         height: mediaQuery.size.height * 0.4,
-                        child: FutureBuilder<List<MyBitesData>>(
-                          future: loadWishlistFuture(request),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                child: Text(
-                                  'Error: ${snapshot.error}',
-                                  style: GoogleFonts.poppins(fontSize: 18, color: Colors.red),
-                                ),
-                              );
-                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                              return Center(
+                        child: wishlist.isEmpty
+                            ? Center(
                                 child: Text(
                                   'Your Bites is empty',
                                   style: GoogleFonts.poppins(fontSize: 18, color: Colors.brown),
                                 ),
-                              );
-                            } else {
-                              final wishlist = snapshot.data!;
-                              return ListView.builder(
+                              )
+                            : ListView.builder(
                                 itemCount: wishlist.length,
                                 itemBuilder: (context, index) {
                                   final item = wishlist[index];
@@ -323,14 +361,30 @@ class _MyHomePageState extends State<MyHomePage> {
                                         fit: BoxFit.cover,
                                       ),
                                       title: Text(item.fields.name),
+                                      trailing: IconButton(                  
+                                        icon: Icon(Icons.remove_circle_outline, color: Colors.red),                  
+                                        onPressed: () async {                    
+                                          bool success = await _removeProductFromWishlist(item);                    
+                                          if (success) {                      
+                                            setState(() {                        
+                                              wishlist.removeAt(index);                      
+                                            });                      
+                                            saveWishlist();                      
+                                            ScaffoldMessenger.of(context).showSnackBar(                        
+                                              SnackBar(content: Text('Product removed from wishlist')),                      
+                                            );                    
+                                           } else {                      
+                                            ScaffoldMessenger.of(context).showSnackBar(                        
+                                              SnackBar(content: Text('Failed to remove product')),                      
+                                            );                    
+                                          }                  
+                                        },                
+                                      ),
                                     ),
                                   );
                                 },
-                              );
-                            }
-                          },
-                        ),
-                      ),
+                              ),
+                      )
                     ],
                   ),
                 ),
