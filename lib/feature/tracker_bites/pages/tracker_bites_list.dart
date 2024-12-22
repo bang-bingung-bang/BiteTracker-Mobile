@@ -5,6 +5,7 @@ import 'package:bite_tracker_mobile/feature/tracker_bites/pages/tracker_bites_ed
 import 'package:bite_tracker_mobile/feature/tracker_bites/pages/tracker_bites_form.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -99,6 +100,7 @@ class _TrackerBitesListPagesState extends State<TrackerBitesListPages> {
     final request = context.read<CookieRequest>();
 
     return Scaffold(
+      backgroundColor: const Color.fromARGB(59, 158, 158, 158),
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -108,22 +110,33 @@ class _TrackerBitesListPagesState extends State<TrackerBitesListPages> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(30.0),
         child: Column(
           children: [
             Text(
               widget.time,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18.0,
+              style: GoogleFonts.poppins(
+                textStyle: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             const SizedBox(height: 20.0),
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                border: Border.all(color: const Color.fromARGB(255, 221, 221, 221)),
+                borderRadius: const BorderRadius.all(Radius.circular(20)),
+                color: const Color(0xFFB99867),
+                boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFB99867).withOpacity(0.3),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
               ),
               child: FutureBuilder<List<BiteTrackerModel>>(
                 future: _futureBites, // _fetchBites(request),
@@ -137,15 +150,26 @@ class _TrackerBitesListPagesState extends State<TrackerBitesListPages> {
                     );
                   } else {
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.all(10),
+                      return Padding(
+                        padding: const EdgeInsets.all(10),
                         child: Center(
-                          child: Text(
-                            'No bites found',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          child: Column(
+                            children: [
+                              const Icon(
+                                Icons.warning,
+                                size: 50,
+                                color: Colors.grey,
+                              ),
+                              Text(
+                                'No bites found',
+                                style: GoogleFonts.poppins(
+                                  textStyle: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       );
@@ -165,17 +189,22 @@ class _TrackerBitesListPagesState extends State<TrackerBitesListPages> {
                                 children: [
                                   Text(
                                     bite.fields.biteName,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                    style: GoogleFonts.poppins(
+                                      textStyle: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     '${bite.fields.biteCalories} calories',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
+                                    style: GoogleFonts.poppins(
+                                      textStyle: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -190,17 +219,31 @@ class _TrackerBitesListPagesState extends State<TrackerBitesListPages> {
                                 },
                                 itemBuilder: (BuildContext context) {
                                   return [
-                                    const PopupMenuItem<String>(
+                                    PopupMenuItem<String>(
                                       value: 'edit',
-                                      child: Text('Edit'),
+                                      child: Text(
+                                        'Edit',
+                                        style: GoogleFonts.poppins(
+                                          textStyle: const TextStyle(
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                    const PopupMenuItem<String>(
+                                    PopupMenuItem<String>(
                                       value: 'delete',
-                                      child: Text('Delete'),
+                                      child: Text(
+                                        'Delete',
+                                        style: GoogleFonts.poppins(
+                                          textStyle: const TextStyle(
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ];
                                 },
-                                icon: const Icon(Icons.more_vert),
+                                icon: const Icon(Icons.chevron_right),
                               ),
                             ),
                           );
@@ -212,20 +255,30 @@ class _TrackerBitesListPagesState extends State<TrackerBitesListPages> {
               ),
             ),
             const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () => _navigateToFormPage(context, request),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                backgroundColor: Colors.blue,
+            Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                color: const Color(0xFF533A2E),
+                borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text(
-                'Add New Bite',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
+              child: ElevatedButton(
+                onPressed: () => _navigateToFormPage(context, request),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFB99867),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  'Add New Bite',
+                  style: GoogleFonts.poppins(
+                    textStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ),
             )
