@@ -7,7 +7,7 @@ import 'package:bite_tracker_mobile/feature/edit_bites/models/product.dart';
 
 class EditBitesData {
   final CookieRequest request;
-  static const String baseUrl = 'http://127.0.0.1:8000/productbites';
+  static const String baseUrl = 'http://faiz-akram-bitetracker.pbp.cs.ui.ac.id/productbites';          /////////////////////
 
   EditBitesData({required this.request});
 

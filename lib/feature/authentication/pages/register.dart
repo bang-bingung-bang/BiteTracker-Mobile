@@ -287,7 +287,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       try {
                                         // Perubahan di sini: menggunakan request.post
                                         final response = await request.post(
-                                          'http://127.0.0.1:8000/auth/register/',
+                                          'http://faiz-akram-bitetracker.pbp.cs.ui.ac.id/auth/register/',
                                           {
                                             'username': _usernameController.text,
                                             'email': _emailController.text,

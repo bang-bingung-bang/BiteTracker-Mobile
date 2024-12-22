@@ -1,4 +1,5 @@
 import 'package:bite_tracker_mobile/feature/mybites/screens/menu.dart';
+import 'package:bite_tracker_mobile/main.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:bite_tracker_mobile/feature/edit_bites/screens/main/pages/menu.dart';
