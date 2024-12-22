@@ -39,7 +39,7 @@ class _ShareBitesScreenState extends State<ShareBitesScreen> {
       if (response.statusCode == 204) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('deleted successfully'),
+            content: Text('Deleted successfully'),
           ),
         );
         setState(() {}); // Refresh the UI after deletion

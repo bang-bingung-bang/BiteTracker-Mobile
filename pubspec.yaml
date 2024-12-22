@@ -30,7 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_fonts: ^6.0.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -40,6 +39,7 @@ dependencies:
   pbp_django_auth: ^0.4.0
   flutter_svg: ^2.0.16
   google_fonts: ^6.2.1
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:
