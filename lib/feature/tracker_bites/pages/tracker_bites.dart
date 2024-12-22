@@ -65,7 +65,7 @@ class _TrackerBitesPagesState extends State<TrackerBitesPages> {
 Future<InfoData> _fetchData(CookieRequest request) async {
   String formattedDate = "${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}";
     
-  final response = await request.get('https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/data-info-by-date/$formattedDate/');
+  final response = await request.get('https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/data-info-by-date/$formattedDate/');
   if (kDebugMode) {
     print(response);
   }

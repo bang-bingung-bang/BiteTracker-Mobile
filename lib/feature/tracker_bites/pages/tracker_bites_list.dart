@@ -61,7 +61,7 @@ class _TrackerBitesListPagesState extends State<TrackerBitesListPages> {
   Future<List<BiteTrackerModel>> _fetchBites(CookieRequest request) async {
     String formattedDate = "${widget.date.year}-${widget.date.month.toString().padLeft(2, '0')}-${widget.date.day.toString().padLeft(2, '0')}";
 
-    final response = await request.get('https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/show-json-by-date/$formattedDate/');
+    final response = await request.get('https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/show-json-by-date/$formattedDate/');
     var data = response;
 
     if (kDebugMode) {
@@ -82,7 +82,7 @@ class _TrackerBitesListPagesState extends State<TrackerBitesListPages> {
 
   Future<void> _deleteBite(CookieRequest request, String pk) async {
     final response = await request.postJson(
-      'https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/delete-bite-flutter/$pk/',
+      'https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/delete-bite-flutter/$pk/',
       jsonEncode(<String, String>{'pk': pk}),
     );
 

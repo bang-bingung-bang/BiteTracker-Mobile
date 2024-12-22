@@ -238,7 +238,7 @@ class _BiteTrackerEditPageState extends State<BiteTrackerEditPage> {
                       String formattedDate = "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
                       // Kirim ke Django dan tunggu respons
                       final response = await request.postJson(
-                        "https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/edit-bite-tracker/$_pk/",
+                        "https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/edit-bite-tracker/$_pk/",
                         jsonEncode(<String, String>{
                           "bite_name": _nameController.text,
                           "bite_calories": _calorieController.text,

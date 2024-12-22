@@ -83,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       final request = context.read<CookieRequest>();
       final response = await request.post(
-        'https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/mybites/flutter/add/',
+        'https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/mybites/flutter/add/',
         {
           'product_id': product.pk.toString(),
         },
@@ -124,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (!request.loggedIn) return;
 
       try {
-        final response = await request.get('https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/mybites/flutter/view/');
+        final response = await request.get('https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/mybites/flutter/view/');
         if (response['wishlist'] != null) {
           final List<MyBitesData> fetchedWishlist = 
               (response['wishlist'] as List).map((json) => MyBitesData.fromJson(json)).toList();
@@ -152,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final product_id = product.pk;
 
       final response = await request.post(
-        'https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/mybites/flutter/remove/$product_id/',
+        'https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/mybites/flutter/remove/$product_id/',
         {}
       );
 
@@ -207,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     try {
-      final response = await request.get('http://127.0.0.1:8000/mybites/flutter/view/');
+      final response = await request.get('https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/mybites/flutter/view/');
       if (response['wishlist'] != null) {
         final List<MyBitesData> wishlist =
             (response['wishlist'] as List).map((json) => MyBitesData.fromJson(json)).toList();
