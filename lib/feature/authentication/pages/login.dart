@@ -1,4 +1,5 @@
 import 'package:bite_tracker_mobile/feature/authentication/models/user_models.dart';
+import 'package:bite_tracker_mobile/feature/edit_bites/screens/main/pages/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -112,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                       if (request.loggedIn) {
                         String message = response['message'];
                         String uname = response['username'];
-                        logInUser = User.fromJson(response);
+                        logInUser = User.fromJson(response); ///////ini buat si usernya
                         if (context.mounted) {
                           Navigator.pushReplacement(
                             context,
@@ -158,11 +159,11 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 36.0),
                   GestureDetector(
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => const RegisterPage()),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const RegisterPage()),
+                      );
                     },
                     child: Text(
                       'Don\'t have an account? Register',

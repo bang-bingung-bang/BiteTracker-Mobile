@@ -1,3 +1,5 @@
+//lib\feature\edit_bites\models\product.dart
+
 import 'dart:convert';
 
 List<Product> productFromJson(String str) => 
