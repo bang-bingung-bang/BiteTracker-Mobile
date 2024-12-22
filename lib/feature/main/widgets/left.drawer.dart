@@ -1,3 +1,4 @@
+import 'package:bite_tracker_mobile/feature/sharebites/screens/sharebites_screen.dart';
 import 'package:bite_tracker_mobile/feature/tracker_bites/pages/tracker_bites.dart';
 import 'package:bite_tracker_mobile/feature/authentication/models/user_models.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +62,18 @@ class LeftDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const TrackerBitesPages(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.add_a_photo_outlined),
+            title: const Text('ShareBites'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ShareBitesScreen(),
                 ),
               );
             },
