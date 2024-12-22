@@ -2,6 +2,7 @@ import 'package:bite_tracker_mobile/feature/main/pages/footer.dart';
 import 'package:bite_tracker_mobile/feature/mybites/models/mybites_data.dart';
 import 'package:bite_tracker_mobile/feature/mybites/screens/product_wishlist.dart';
 import 'package:bite_tracker_mobile/feature/main/pages/menu.dart';
+import 'package:bite_tracker_mobile/main.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -130,10 +131,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     saveWishlist();
   }
-  final List<ItemHomepage> items = [
-    ItemHomepage("Let's go back to main page!", Icons.add_home_work_rounded),
-    ItemHomepage("Wanna see product list?", Icons.shopping_cart),
-  ];
 
   @override
   Widget build(BuildContext context) {

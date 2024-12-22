@@ -68,7 +68,7 @@ class _BiteTrackerFormPageState extends State<BiteTrackerFormPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Bites Name',
