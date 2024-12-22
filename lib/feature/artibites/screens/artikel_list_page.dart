@@ -5,7 +5,9 @@ import 'package:bite_tracker_mobile/feature/artibites/screens/add_artikel_page.d
 import 'package:bite_tracker_mobile/feature/artibites/screens/edit_artikel_page.dart'; // Tambahkan Edit Artikel
 
 class ArtikelListPage extends StatefulWidget {
-  const ArtikelListPage({super.key});
+  final bool isAdmin;
+
+  const ArtikelListPage({super.key, required this.isAdmin});
 
   @override
   _ArtikelListPageState createState() => _ArtikelListPageState();
@@ -22,8 +24,7 @@ class _ArtikelListPageState extends State<ArtikelListPage> {
           ? const Center(child: Text('Belum ada artikel!'))
           : ListView.separated(
               itemCount: _artikels.length,
-              separatorBuilder: (context, index) =>
-                  const Divider(), // Pemisah antar artikel
+              separatorBuilder: (context, index) => const Divider(),
               itemBuilder: (context, index) {
                 final artikel = _artikels[index];
                 return Card(
@@ -52,7 +53,6 @@ class _ArtikelListPageState extends State<ArtikelListPage> {
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                     onTap: () {
-                      // Navigasi ke halaman detail artikel
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -61,33 +61,33 @@ class _ArtikelListPageState extends State<ArtikelListPage> {
                         ),
                       );
                     },
-                    onLongPress: () {
-                      // Menampilkan dialog untuk edit atau hapus artikel
-                      _showEditDeleteDialog(artikel);
-                    },
+                    onLongPress: widget.isAdmin
+                        ? () => _showEditDeleteDialog(artikel)
+                        : null, // Nonaktifkan fitur jika bukan admin
                   ),
                 );
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // Navigasi ke halaman Add Artikel
-          final artikelBaru = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddArtikelPage()),
-          );
-          if (artikelBaru != null && artikelBaru is Artikel) {
-            setState(() {
-              _artikels.add(artikelBaru); // Menambahkan artikel baru
-            });
-          }
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: widget.isAdmin
+          ? FloatingActionButton(
+              onPressed: () async {
+                final artikelBaru = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AddArtikelPage()),
+                );
+                if (artikelBaru != null && artikelBaru is Artikel) {
+                  setState(() {
+                    _artikels.add(artikelBaru);
+                  });
+                }
+              },
+              child: const Icon(Icons.add),
+            )
+          : null, // Sembunyikan tombol tambah artikel jika bukan admin
     );
   }
 
-  // Dialog untuk mengedit atau menghapus artikel
   void _showEditDeleteDialog(Artikel artikel) {
     showDialog(
       context: context,
@@ -96,7 +96,6 @@ class _ArtikelListPageState extends State<ArtikelListPage> {
         actions: [
           TextButton(
             onPressed: () {
-              // Navigasi ke halaman edit artikel
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -107,7 +106,7 @@ class _ArtikelListPageState extends State<ArtikelListPage> {
                   setState(() {
                     final index = _artikels.indexOf(artikel);
                     if (index != -1) {
-                      _artikels[index] = updatedArtikel; // Update artikel
+                      _artikels[index] = updatedArtikel;
                     }
                   });
                 }
@@ -119,7 +118,7 @@ class _ArtikelListPageState extends State<ArtikelListPage> {
           TextButton(
             onPressed: () {
               setState(() {
-                _artikels.remove(artikel); // Hapus artikel
+                _artikels.remove(artikel);
               });
               Navigator.pop(context);
             },

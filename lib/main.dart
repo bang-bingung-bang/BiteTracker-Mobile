@@ -29,7 +29,9 @@ class MyApp extends StatelessWidget {
         ),
         initialRoute: '/artikelList',
         routes: {
-          '/artikelList': (context) => const ArtikelListPage(),
+          '/artikelList': (context) => const ArtikelListPage(
+                isAdmin: null,
+              ),
           '/addArtikel': (context) => const AddArtikelPage(),
           '/editArtikel': (context) => EditArtikelPage(
                 artikel: ModalRoute.of(context)!.settings.arguments as Artikel,
