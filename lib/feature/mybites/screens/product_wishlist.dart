@@ -25,7 +25,7 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
   }
 
   Future<List<MyBitesData>> fetchMyBitesData() async {
-  final url = Uri.parse('http://127.0.0.1:8000/mybites/json/');
+  final url = Uri.parse('https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/mybites/json/');
 
   final response = await http.get(url);
   try {
@@ -179,7 +179,7 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
                                   setState (() async {
                                     final product_id = item.pk;
                                     final response = await request.postJson(
-                                      "http://127.0.0.1:8000/mybites/flutter/add/$product_id/",
+                                      "https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/mybites/flutter/add/$product_id/",
                                       jsonEncode(product_id)
                                     );
                                     if (context.mounted) {
