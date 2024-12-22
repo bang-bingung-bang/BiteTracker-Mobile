@@ -28,7 +28,7 @@ class _ShareBitesScreenState extends State<ShareBitesScreen> {
   }
 
   Future<List<ShareBites>> fetchShareBites(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/sharebites/json/');
+    final response = await request.get('https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/sharebites/json/');
     List<ShareBites> listShareBites = [];
     for (var d in response) {
       if (d != null) {
@@ -41,7 +41,7 @@ class _ShareBitesScreenState extends State<ShareBitesScreen> {
   Future<void> deletePost(int postId) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://localhost:8000/sharebites/post/$postId/delete/'),
+        Uri.parse('https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/sharebites/post/$postId/delete/'),
       );
 
       if (response.statusCode == 204) {
