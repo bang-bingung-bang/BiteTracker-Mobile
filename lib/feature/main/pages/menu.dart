@@ -1,197 +1,258 @@
-import 'package:bite_tracker_mobile/feature/mybites/models/mybites_data.dart';
-import 'package:bite_tracker_mobile/feature/mybites/screens/product_wishlist.dart';
-import 'package:bite_tracker_mobile/feature/mybites/screens/menu.dart';
+import 'package:bite_tracker_mobile/core/assets.dart';
+import 'package:bite_tracker_mobile/feature/main/pages/footer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MyBites',
-      theme: ThemeData(
-        colorScheme: ColorScheme(
-          primary: Colors.brown,
-          secondary: Colors.brown.shade800,
-          surface: Colors.white,
-          background: Colors.yellow[50]!,
-          error: Colors.red,
-          onPrimary: Colors.black,
-          onSecondary: Colors.black,
-          onSurface: Colors.black,
-          onBackground: Colors.black,
-          onError: Colors.white,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      home: MyHomePage(),
-    );
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final List<ItemHomepage> items = [
-    ItemHomepage("MyBites!", Icons.favorite),
-    ItemHomepage("TrackerBites!", Icons.track_changes),
-  ];
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final isLandscape = mediaQuery.orientation == Orientation.landscape;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'MyBites',
+          'BiteTracker',
           style: GoogleFonts.lobster(
-            color: Colors.white,
-            fontSize: 28,
+            textStyle: const TextStyle(
+              fontSize: 40.0, 
+              fontWeight: FontWeight.bold,
+              color: Colors.white, 
+            ),
           ),
         ),
-        centerTitle: true,
-        backgroundColor: Colors.brown.shade800,
+        backgroundColor: const Color(0xFF533A2E),
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.brown.shade100, Colors.brown.shade300],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: isLandscape ? 8 : 16,
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'Welcome to MyBites!',
-                      style: GoogleFonts.poppins(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.brown.shade800,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Discover and track your favorite snacks.',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        color: Colors.brown.shade600,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height * 0.4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                image: DecorationImage(
+                  image: AssetImage(Assets.images.background),
+                  fit: BoxFit.cover,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  children: items.map((item) {
-                    return GestureDetector(
-                      onTap: () async {
-                        if (item.name == "MyBites!") {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MyBitesApp(),
-                            ),
-                          );
-                        } else if (item.name == "TrackerBites!") {
-                          ScaffoldMessenger.of(context)
-                            ..hideCurrentSnackBar()
-                            ..showSnackBar(
-                              SnackBar(
-                                  content: Text("Anda menekan ${item.name}!")),
-                            );
-                        }
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.brown.shade200,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.brown.shade100,
-                              offset: const Offset(0, 3),
-                              blurRadius: 6,
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              item.icon,
-                              size: 40,
-                              color: Colors.brown.shade900,
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Text(
-                                item.name,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 18,
-                                  color: Colors.brown.shade800,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.6),
+                          Colors.black.withOpacity(0.3),
+                        ],
                       ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.brown.shade50,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24),
+                    ),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.brown.shade100,
-                      offset: const Offset(0, -2),
-                      blurRadius: 6,
+                  Center( // Memastikan semua isi berada di tengah
+                    child: Text(
+                      'Track Your Bites,\nTailor Your Eats!',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        height: 1.3,
+                      ),
                     ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+
+            // About Section
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'What is Bite Tracker?',
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Track your meals, discover new recipes, and achieve your nutrition goals with our easy-to-use platform.',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      height: 1.5,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'How to use Bite Tracker?',
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Simply create an account, log your meals, and let Bite Tracker help you maintain a balanced diet.',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      height: 1.5,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Categories Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                children: [
+                  Text(
+                    'Find Your Perfect Bites!',
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 14),
+                  _buildCategoryGrid(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: FooterNavigationBar(
+        selectedIndex: _selectedIndex, 
+        onItemTapped: _onItemTapped,
+      ),
+    );
+  }
+
+  Widget _buildCategoryGrid() {
+    final List<Map<String, String>> categories = [
+      {
+        'title': 'Vegan',
+        'image': 'https://static.wixstatic.com/media/bd7c83_c8c12d945dcc44298adf849d657e3418~mv2.jpg',
+        'description': 'Produk makanan berbasis tumbuhan, bebas dari bahan hewani.',
+      },
+      {
+        'title': 'Non-Vegan',
+        'image': 'https://static.wixstatic.com/media/bd7c83_14d1ef4229964f86bfe9d466665a307d~mv2.jpg',
+        'description': 'Produk makanan yang mengandung bahan-bahan hewani.',
+      },
+      {
+        'title': 'High Calorie',
+        'image': 'https://static.wixstatic.com/media/bd7c83_81326449af1c45dcb119da80d9cb56a7~mv2.jpg',
+        'description': 'Makanan dengan kandungan kalori tinggi, cocok untuk meningkatkan energi.',
+      },
+      {
+        'title': 'Low Calorie',
+        'image': 'https://static.wixstatic.com/media/bd7c83_1f6ca149b79a45ee8c2766e122898cee~mv2.jpg',
+        'description': 'Pilihan rendah kalori untuk menjaga asupan energi harian.',
+      },
+      {
+        'title': 'High Sugar',
+        'image': 'https://static.wixstatic.com/media/bd7c83_cedae553bea34977a59aa85c216860ee~mv2.jpg',
+        'description': 'Makanan dengan kandungan gula tinggi untuk menambah rasa manis.',
+      },
+      {
+        'title': 'Low Sugar',
+        'image': 'https://static.wixstatic.com/media/bd7c83_3de75328881143468a28620e83e89785~mv2.jpg',
+        'description': 'Pilihan rendah gula untuk mengurangi asupan manis dalam diet.',
+      },
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.8,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemCount: categories.length,
+      itemBuilder: (context, index) {
+        final category = categories[index];
+        return Card(
+          color: Colors.white, // Set the background color to white
+          elevation: 4, // Add shadow to the card
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch, // Ensure content is aligned
+            children: [
+              Expanded(
+                flex: 3,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(8),
+                  ),
+                  child: Image.network(
+                    category['image'] ?? '',
+                    fit: BoxFit.cover,
+                  ),
                 ),
+              ),
+              Expanded(
+                flex: 2,
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0), // Adjusted padding
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start, // Align elements to the start
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Your Bites!',
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.brown.shade800,
+                      ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFCCBFB0),
+                          minimumSize: const Size(double.infinity, 36),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
                         ),
+                        child: Text(
+                          category['title'] ?? '',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16, // Larger font size for the title
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8), // Add space between button and description
+                      Text(
+                        category['description'] ?? '',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12, // Increased font size for the description
+                          color: Colors.grey[600],
+                        ),
+                        textAlign: TextAlign.center, // Center the description text
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -199,82 +260,8 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class ItemHomepage {
-  final String name;
-  final IconData icon;
-  ItemHomepage(this.name, this.icon);
-}
-
-class ItemCard extends StatelessWidget {
-  final ItemHomepage item;
-  final List<MyBitesData> wishlist;
-  final Function(List<MyBitesData>) updateWishlist;
-
-  const ItemCard({
-    super.key,
-    required this.item,
-    required this.wishlist,
-    required this.updateWishlist,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.secondary,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: () async {
-          if (item.name == "Wanna see product list?") {
-            final newWishlist = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProductsWishlist(
-                  wishlist: List.from(wishlist),
-                ),
-              ),
-            );
-
-            if (newWishlist != null && newWishlist is List<MyBitesData>) {
-              updateWishlist(newWishlist);
-            }
-          } else {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(content: Text("Anda menekan tombol ${item.name}!")),
-              );
-          }
-        },
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  item.icon,
-                  color: Colors.white,
-                  size: 30.0,
-                ),
-                const Padding(padding: EdgeInsets.all(3)),
-                Text(
-                  item.name,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
