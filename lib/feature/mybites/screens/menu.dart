@@ -131,10 +131,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     saveWishlist();
   }
-  // final List<ItemHomepage> items = [
-  //   ItemHomepage("Let's go back to main page!", Icons.add_home_work_rounded),
-  //   ItemHomepage("Wanna see product list?", Icons.shopping_cart),
-  // ];
 
   @override
   Widget build(BuildContext context) {

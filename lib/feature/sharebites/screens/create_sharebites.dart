@@ -158,7 +158,7 @@ class _CreateShareBitesScreenState extends State<CreateShareBitesScreen> {
                   if (_formKey.currentState!.validate()) {
                     try {
                       final response = await request.postJson(
-                        "http://127.0.0.1:8000/sharebites/create-flutter/",
+                        "https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/sharebites/create-flutter/",
                         jsonEncode(<String, dynamic>{
                           'user_id': 2,
                           'title': _title,
