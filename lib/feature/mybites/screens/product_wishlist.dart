@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:http/http.dart' as http;
 import 'package:bite_tracker_mobile/feature/mybites/models/mybites_data.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -22,8 +22,17 @@ class _ProductsWishlistState extends State<ProductsWishlist> {
   }
 
   Future<List<MyBitesData>> fetchMyBitesData() async {
-    final String response = await rootBundle.loadString('assets/data/mybites_data.json');
-    return myBitesDataFromJson(response);
+    final url = 'http://127.0.0.1:8000/mybites/json/'; // Ganti dengan URL API Django Anda
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        return myBitesDataFromJson(response.body);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (error) {
+      throw Exception('Error fetching data: $error');
+    }
   }
 
   @override

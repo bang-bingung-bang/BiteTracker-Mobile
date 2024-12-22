@@ -1,5 +1,3 @@
-//lib\feature\authentication\pages\login.dart
-
 import 'package:bite_tracker_mobile/feature/authentication/models/user_models.dart';
 import 'package:bite_tracker_mobile/feature/edit_bites/screens/main/pages/menu.dart';
 import 'package:flutter/material.dart';
@@ -120,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const EditBitesMenu()), ///
+                                builder: (context) => const MyHomePage()),
                           );
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()

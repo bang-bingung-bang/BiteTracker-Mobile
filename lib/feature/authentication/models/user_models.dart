@@ -1,5 +1,3 @@
-////lib\feature\authentication\models\user_models.dart
-
 import 'dart:convert';
 
 late User? logInUser;
