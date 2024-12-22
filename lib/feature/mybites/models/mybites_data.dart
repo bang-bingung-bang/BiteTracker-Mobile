@@ -47,8 +47,6 @@ class Fields {
   VeganTag veganTag;
   Tag sugarTag;
   String image;
-  DateTime createdAt;
-  DateTime updatedAt;
 
   Fields({
     required this.store,
@@ -60,8 +58,6 @@ class Fields {
     required this.veganTag,
     required this.sugarTag,
     required this.image,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   factory Fields.fromJson(Map<String, dynamic> json) => Fields(
@@ -74,8 +70,6 @@ class Fields {
     veganTag: veganTagValues.map[json["vegan_tag"]]!,
     sugarTag: tagValues.map[json["sugar_tag"]]!,
     image: json["image"],
-    createdAt: DateTime.parse(json["created_at"]),
-    updatedAt: DateTime.parse(json["updated_at"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -88,8 +82,6 @@ class Fields {
     "vegan_tag": veganTagValues.reverse[veganTag],
     "sugar_tag": tagValues.reverse[sugarTag],
     "image": image,
-    "created_at": createdAt.toIso8601String(),
-    "updated_at": updatedAt.toIso8601String(),
   };
 
   @override
