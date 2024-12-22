@@ -1,39 +1,8 @@
 import 'package:bite_tracker_mobile/feature/mybites/models/mybites_data.dart';
 import 'package:bite_tracker_mobile/feature/mybites/screens/product_wishlist.dart';
+import 'package:bite_tracker_mobile/feature/main/widgets/left_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MyBites',
-      theme: ThemeData(
-        colorScheme: ColorScheme(
-          primary: Colors.brown,
-          secondary: Colors.brown.shade800,
-          surface: Colors.white,
-          background: Colors.yellow[50]!,
-          error: Colors.red,
-          onPrimary: Colors.black,
-          onSecondary: Colors.black,
-          onSurface: Colors.black,
-          onBackground: Colors.black,
-          onError: Colors.white,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      home: MyHomePage(),
-    );
-  }
-}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -65,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
         backgroundColor: Colors.brown.shade800,
       ),
+      drawer: const LeftDrawer(),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
