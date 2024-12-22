@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+////lib\feature\edit_bites\screens\pages\product_detail.dart
 
+import 'package:flutter/material.dart';
+import 'package:bite_tracker_mobile/feature/authentication/models/user_models.dart';
 import 'package:bite_tracker_mobile/feature/edit_bites/models/editbites_data.dart';
 import 'package:bite_tracker_mobile/feature/edit_bites/models/product.dart';
 
@@ -21,20 +23,33 @@ class ProductFormScreen extends StatefulWidget {
 
 class _ProductFormScreenState extends State<ProductFormScreen> {
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+
   late TextEditingController _nameController;
   late TextEditingController _priceController;
   late TextEditingController _descriptionController;
   late TextEditingController _caloriesController;
   late TextEditingController _imageController;
+  
   String _selectedStore = 'QITA_MART';
   String _selectedCalorieTag = 'LOW';
   String _selectedVeganTag = 'NON_VEGAN';
   String _selectedSugarTag = 'LOW';
-  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+
+    if (logInUser?.role != true) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unauthorized: Admin access required')),
+        );
+        Navigator.pop(context);
+      });
+      return;
+    }
+
     _nameController = TextEditingController();
     _priceController = TextEditingController();
     _descriptionController = TextEditingController();
@@ -65,20 +80,81 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         _selectedCalorieTag = product.fields.calorieTag;
         _selectedVeganTag = product.fields.veganTag;
         _selectedSugarTag = product.fields.sugarTag;
+        _isLoading = false;
       });
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error loading product: $e')),
         );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        Navigator.pop(context);
       }
     }
+  }
+
+  Future<void> _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final now = DateTime.now();
+        final product = Product(
+          model: "editbites.product",
+          pk: widget.isEditing ? widget.productId! : 0,
+          fields: Fields(
+            store: _selectedStore,
+            name: _nameController.text,
+            price: int.parse(_priceController.text),
+            description: _descriptionController.text,
+            calories: int.parse(_caloriesController.text),
+            calorieTag: _selectedCalorieTag,
+            veganTag: _selectedVeganTag,
+            sugarTag: _selectedSugarTag,
+            image: _imageController.text,
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+
+        String message;
+        if (widget.isEditing) {
+          message = await widget.editBitesData.updateProduct(widget.productId!, product);
+        } else {
+          message = await widget.editBitesData.createProduct(product);
+        }
+
+        if (mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message)),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e')),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _priceController.dispose();
+    _descriptionController.dispose();
+    _caloriesController.dispose();
+    _imageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -100,14 +176,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Store dropdown
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'Store',
                   border: OutlineInputBorder(),
                 ),
                 value: _selectedStore,
-                items: const [
+                items: [
                   DropdownMenuItem(value: 'QITA_MART', child: Text('QITA MART')),
                   DropdownMenuItem(value: 'TUTUL_V_MARKET', child: Text('TUTUL V MARKET')),
                   DropdownMenuItem(value: 'AL_HIKAM_MART', child: Text('AL HIKAM MART')),
@@ -124,7 +199,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Name field
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
@@ -140,7 +214,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Price field
               TextFormField(
                 controller: _priceController,
                 decoration: const InputDecoration(
@@ -160,7 +233,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Description field
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(
@@ -177,7 +249,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Calories field
               TextFormField(
                 controller: _caloriesController,
                 decoration: const InputDecoration(
@@ -197,7 +268,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Image URL field
               TextFormField(
                 controller: _imageController,
                 decoration: const InputDecoration(
@@ -208,12 +278,14 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter image URL';
                   }
+                  if (!Uri.tryParse(value)!.isAbsolute) {
+                    return 'Please enter a valid URL';
+                  }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
 
-              // Tags section
               Row(
                 children: [
                   Expanded(
@@ -261,7 +333,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Vegan status
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'Vegan Status',
@@ -282,12 +353,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Submit button
               ElevatedButton(
                 onPressed: _isLoading ? null : _submitForm,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.brown[300],
+                  backgroundColor: Colors.deepPurple,
                   foregroundColor: Colors.white,
                 ),
                 child: _isLoading
@@ -306,73 +376,5 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        final now = DateTime.now().toIso8601String();
-        final product = Product(
-          model: "editbites.product",
-          pk: widget.isEditing ? widget.productId! : 0,
-          fields: Fields(
-            store: _selectedStore,
-            name: _nameController.text,
-            price: int.parse(_priceController.text),
-            description: _descriptionController.text,
-            calories: int.parse(_caloriesController.text),
-            calorieTag: _selectedCalorieTag,
-            veganTag: _selectedVeganTag,
-            sugarTag: _selectedSugarTag,
-            image: _imageController.text,
-            createdAt: DateTime.parse(now),
-            updatedAt: DateTime.parse(now),
-          ),
-        );
-
-        if (widget.isEditing) {
-          await widget.editBitesData.updateProduct(widget.productId!, product);
-        } else {
-          await widget.editBitesData.createProduct(product);
-        }
-
-        if (mounted) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(widget.isEditing
-                  ? 'Product updated successfully'
-                  : 'Product created successfully'),
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e')),
-          );
-        }
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _priceController.dispose();
-    _descriptionController.dispose();
-    _caloriesController.dispose();
-    _imageController.dispose();
-    super.dispose();
   }
 }

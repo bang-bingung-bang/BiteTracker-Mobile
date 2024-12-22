@@ -1,3 +1,5 @@
+import 'package:bite_tracker_mobile/feature/authentication/pages/login.dart';
+import 'package:bite_tracker_mobile/feature/main/pages/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -23,20 +25,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Bite Tracker',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSwatch(
-            primarySwatch: Colors.deepPurple,
-          ).copyWith(secondary: Colors.deepPurple[400]),
+          scaffoldBackgroundColor: Colors.white, 
         ),
-        initialRoute: '/artikelList',
-        routes: {
-          '/artikelList': (context) => const ArtikelListPage(
-                isAdmin: null,
-              ),
-          '/addArtikel': (context) => const AddArtikelPage(),
-          '/editArtikel': (context) => EditArtikelPage(
-                artikel: ModalRoute.of(context)!.settings.arguments as Artikel,
-              ),
-        },
+        home: const LoginPage(),
       ),
     );
   }
