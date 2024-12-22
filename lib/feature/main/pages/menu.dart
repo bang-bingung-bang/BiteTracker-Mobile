@@ -1,5 +1,6 @@
 import 'package:bite_tracker_mobile/feature/mybites/models/mybites_data.dart';
 import 'package:bite_tracker_mobile/feature/mybites/screens/product_wishlist.dart';
+import 'package:bite_tracker_mobile/feature/mybites/screens/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -110,7 +111,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     return GestureDetector(
                       onTap: () async {
                         if (item.name == "MyBites!") {
-                          
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MyBitesApp(),
+                            ),
+                          );
                         } else if (item.name == "TrackerBites!") {
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()
