@@ -32,7 +32,7 @@ class FooterNavigationBar extends StatelessWidget {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const MyApp(),
+            builder: (context) => const MyBitesApp(),
           ),
         );
         break;

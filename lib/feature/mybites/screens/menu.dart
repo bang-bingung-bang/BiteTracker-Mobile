@@ -7,7 +7,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:bite_tracker_mobile/feature/main/pages/footer.dart';
 
 void main() {
   runApp(const MyBitesApp());
@@ -51,39 +51,19 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<MyBitesData> wishlist = [];
 
+  int _selectedIndex = 4;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   void updateWishlist(List<MyBitesData> newWishlist) {
     setState(() {
       wishlist.clear();
       wishlist.addAll(newWishlist);
     });
-  }
-
-  Future<bool> _removeProductFromWishlist(MyBitesData product) async {
-    try {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/mybites/flutter/remove'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Cookie': context.read<CookieRequest>().cookie,
-        },
-        body: jsonEncode({
-          'product_id': product.pk,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final responseBody = jsonDecode(response.body);
-        if (responseBody['wishlist'] != null) {
-          final List<MyBitesData> updatedWishlist = 
-              (responseBody['wishlist'] as List).map((json) => MyBitesData.fromJson(json)).toList();
-          updateWishlist(updatedWishlist);
-          return true;
-        }
-      }
-    } catch (e) {
-      print('Error removing product: $e');
-    }
-    return false;
   }
 
   Future<void> saveWishlist() async {
@@ -100,17 +80,109 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void addToWishlist(MyBitesData product) async {
-    bool success = await _addProductToWishlist(product);
+    try {
+      final request = context.read<CookieRequest>();
+      final response = await request.post(
+        'http://127.0.0.1:8000/mybites/flutter/add/',
+        {
+          'product_id': product.pk.toString(),
+        },
+      );
 
-    if (success) {
-      setState(() {
-        wishlist.add(product);
-      });
-      saveWishlist();
-      loadWishlist(context.read<CookieRequest>());
-    } else {
+      if (response['status'] == true) {
+        setState(() {
+          wishlist.add(product);
+        });
+
+        saveWishlist();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Product added to wishlist successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? 'Failed to add product to wishlist'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add product to wishlist')),
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> loadWishlist(CookieRequest request) async {
+      if (!request.loggedIn) return;
+
+      try {
+        final response = await request.get('http://127.0.0.1:8000/mybites/flutter/view/');
+        if (response['wishlist'] != null) {
+          final List<MyBitesData> fetchedWishlist = 
+              (response['wishlist'] as List).map((json) => MyBitesData.fromJson(json)).toList();
+          
+          if (mounted) {
+            setState(() {
+              wishlist = fetchedWishlist;
+            });
+          }
+          
+          saveWishlist();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to load wishlist: $e')),
+          );
+        }
+      }
+  }
+
+  Future<void> removeFromWishlist(MyBitesData product) async {
+    try {
+      final request = context.read<CookieRequest>();
+      final product_id = product.pk;
+
+      final response = await request.post(
+        'http://127.0.0.1:8000/mybites/flutter/remove/$product_id/',
+        {}
+      );
+
+      if (response['status'] == true) {
+        setState(() {
+          wishlist.remove(product);
+        });
+
+        saveWishlist();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Product removed from wishlist successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? 'Failed to remove product from wishlist'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -127,27 +199,6 @@ class _MyHomePageState extends State<MyHomePage> {
   List<MyBitesData> parseWishlist(String responseBody) {
     final List<dynamic> parsed = jsonDecode(responseBody);
     return parsed.map((json) => MyBitesData.fromJson(json)).toList();
-  }
-
-  Future<void> loadWishlist(CookieRequest request) async {
-    if (!request.loggedIn) return;
-
-    try {
-      final response = await request.get('http://127.0.0.1:8000/mybites/flutter/view/');
-      if (response['wishlist'] != null) {
-        final List<MyBitesData> fetchedWishlist = 
-            (response['wishlist'] as List).map((json) => MyBitesData.fromJson(json)).toList();
-        setState(() {
-          wishlist.clear();
-          wishlist.addAll(fetchedWishlist);
-        });
-        saveWishlist();
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load wishlist: $e')),
-      );
-    }
   }
 
   Future<List<MyBitesData>> loadWishlistFuture(CookieRequest request) async {
@@ -256,7 +307,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                 wishlist: List.from(wishlist),
                               ),
                             ),
-                          );
+                          ).then((_) {
+                            setState(() {
+                              loadWishlist(context.read<CookieRequest>());
+                            });
+                          });
                           if (newWishlist != null &&
                               newWishlist is List<MyBitesData>) {
                             updateWishlist(newWishlist);
@@ -265,7 +320,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const MyApp(),
+                              builder: (context) => const HomePage(),
                             ),
                           );
                         }
@@ -361,24 +416,19 @@ class _MyHomePageState extends State<MyHomePage> {
                                         fit: BoxFit.cover,
                                       ),
                                       title: Text(item.fields.name),
-                                      trailing: IconButton(                  
-                                        icon: Icon(Icons.remove_circle_outline, color: Colors.red),                  
-                                        onPressed: () async {                    
-                                          bool success = await _removeProductFromWishlist(item);                    
-                                          if (success) {                      
-                                            setState(() {                        
-                                              wishlist.removeAt(index);                      
-                                            });                      
-                                            saveWishlist();                      
-                                            ScaffoldMessenger.of(context).showSnackBar(                        
-                                              SnackBar(content: Text('Product removed from wishlist')),                      
-                                            );                    
-                                           } else {                      
-                                            ScaffoldMessenger.of(context).showSnackBar(                        
-                                              SnackBar(content: Text('Failed to remove product')),                      
-                                            );                    
-                                          }                  
-                                        },                
+                                      trailing: IconButton(
+                                        icon: Icon(Icons.remove_circle_outline, color: Colors.red),
+                                        onPressed: () async {
+                                          await removeFromWishlist(item);
+
+                                          setState(() {
+                                            wishlist.removeAt(index);
+                                          });
+                                          saveWishlist();
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Product removed from wishlist')),
+                                          );
+                                        },
                                       ),
                                     ),
                                   );
@@ -392,6 +442,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: FooterNavigationBar(
+        selectedIndex: _selectedIndex, 
+        onItemTapped: _onItemTapped,
       ),
     );
   }
