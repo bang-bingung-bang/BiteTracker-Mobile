@@ -161,11 +161,11 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 36.0),
                   GestureDetector(
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => const RegisterPage()),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const RegisterPage()),
+                      );
                     },
                     child: Text(
                       'Don\'t have an account? Register',
