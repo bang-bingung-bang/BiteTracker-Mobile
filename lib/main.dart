@@ -1,4 +1,5 @@
 import 'package:bite_tracker_mobile/feature/authentication/pages/login.dart';
+import 'package:bite_tracker_mobile/feature/main/pages/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -17,9 +18,12 @@ class MyApp extends StatelessWidget {
         CookieRequest request = CookieRequest();
         return request;
       },
-      child: const MaterialApp(
+      child: MaterialApp(
         title: 'Bite Tracker',
-        home: LoginPage(),
+        theme: ThemeData(
+          scaffoldBackgroundColor: Colors.white, 
+        ),
+        home: const HomePage(),
       ),
     );
   }

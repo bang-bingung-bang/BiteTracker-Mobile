@@ -1,10 +1,9 @@
+import 'package:bite_tracker_mobile/feature/edit_bites/screens/main/pages/menu.dart';
 import 'package:bite_tracker_mobile/feature/sharebites/screens/sharebites_screen.dart';
 import 'package:bite_tracker_mobile/feature/tracker_bites/pages/tracker_bites.dart';
-import 'package:bite_tracker_mobile/feature/authentication/models/user_models.dart';
 import 'package:flutter/material.dart';
 import 'package:bite_tracker_mobile/feature/main/pages/menu.dart';
 
-// TODO: Import package Form yang dibutuhkan
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -49,7 +48,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const MyHomePage(),
+                  builder: (context) => const HomePage(),
                 ),
               );
             },
@@ -78,6 +77,18 @@ class LeftDrawer extends StatelessWidget {
               );
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.food_bank),
+            title: const Text('Products'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const EditBitesMenu(),
+                ),
+              );
+            },
+          )
           // example of role based widget
           // if (logInUser?.role == false)
           //   ListTile(

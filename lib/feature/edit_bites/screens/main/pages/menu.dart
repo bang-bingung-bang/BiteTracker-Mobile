@@ -1,5 +1,6 @@
 //lib\feature\edit_bites\screens\main\pages\menu.dart
 
+import 'package:bite_tracker_mobile/feature/main/pages/footer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -20,6 +21,13 @@ class _EditBitesMenuState extends State<EditBitesMenu> {
   late Future<List<Product>> futureProducts;
   String? filterParam;
   final TextEditingController _searchController = TextEditingController();
+  int _selectedIndex = 4; // Index for Products/EditBites
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   void initState() {
@@ -242,6 +250,10 @@ class _EditBitesMenuState extends State<EditBitesMenu> {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: FooterNavigationBar(
+        selectedIndex: _selectedIndex, 
+        onItemTapped: _onItemTapped,
       ),
     );
   }

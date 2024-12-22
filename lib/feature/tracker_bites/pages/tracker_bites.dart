@@ -1,3 +1,5 @@
+import 'package:bite_tracker_mobile/feature/main/pages/footer.dart';
+import 'package:bite_tracker_mobile/feature/main/pages/menu.dart';
 import 'package:bite_tracker_mobile/feature/tracker_bites/models/trackerbites_models.dart';
 import 'package:bite_tracker_mobile/feature/tracker_bites/pages/tracker_bites_form.dart';
 import 'package:bite_tracker_mobile/feature/tracker_bites/pages/tracker_bites_list.dart';
@@ -16,6 +18,12 @@ class TrackerBitesPages extends StatefulWidget {
 }
 
 class _TrackerBitesPagesState extends State<TrackerBitesPages> {
+  int _selectedIndex = 2; // Index for TrackerBites
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
   
   DateTime _selectedDate = DateTime.now();
 
@@ -647,6 +655,10 @@ Future<InfoData> _fetchData(CookieRequest request) async {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: FooterNavigationBar(
+        selectedIndex: _selectedIndex, 
+        onItemTapped: _onItemTapped,
       ),
     );
   }
