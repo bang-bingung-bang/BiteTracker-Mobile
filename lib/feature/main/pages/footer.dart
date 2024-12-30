@@ -1,13 +1,12 @@
 import 'package:bite_tracker_mobile/feature/authentication/pages/login.dart';
 import 'package:bite_tracker_mobile/feature/mybites/screens/menu.dart';
-import 'package:bite_tracker_mobile/main.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:bite_tracker_mobile/feature/edit_bites/screens/main/pages/menu.dart';
 import 'package:bite_tracker_mobile/feature/sharebites/screens/sharebites_screen.dart';
 import 'package:bite_tracker_mobile/feature/tracker_bites/pages/tracker_bites.dart';
 import 'package:bite_tracker_mobile/feature/main/pages/menu.dart';
-import 'package:bite_tracker_mobile/feature/main/pages/footer.dart';
+import 'package:bite_tracker_mobile/feature/artibites/screens/artikel_list_page.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -36,7 +35,7 @@ class FooterNavigationBar extends StatelessWidget {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const MyApp(),
+            builder: (context) => const MyBitesApp(),
           ),
         );
         break;
@@ -68,15 +67,14 @@ class FooterNavigationBar extends StatelessWidget {
         );
         break;
       
-      // Uncomment if you want to add ArtiBites back
-      // case 5: // ArtiBites
-      //   Navigator.pushReplacement(
-      //     context,
-      //     MaterialPageRoute(
-      //       builder: (context) => const ProductBitesScreen(),
-      //     ),
-      //   );
-      //   break;
+      case 5: // ArtiBites
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ArtikelListPage(isAdmin: true,),
+          ),
+        );
+        break;
 
       case 6: // Logout
         final request = context.read<CookieRequest>();

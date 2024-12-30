@@ -45,7 +45,7 @@ class _ShareBitesCardState extends State<ShareBitesCard> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.get(
-        'https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/sharebites/post/${widget.post.pk}/like-status/?user_id=${widget.currentUserId}',
+        'https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/sharebites/post/${widget.post.pk}/like-status/?user_id=${widget.currentUserId}',
       );
       
       if (mounted && response['status'] == 'success') {
@@ -63,7 +63,7 @@ class _ShareBitesCardState extends State<ShareBitesCard> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.postJson(
-        'https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/sharebites/post/${widget.post.pk}/like-toggle/',
+        'https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/sharebites/post/${widget.post.pk}/like-toggle/',
         jsonEncode({
           'user_id': widget.currentUserId,
         }),
@@ -88,7 +88,7 @@ class _ShareBitesCardState extends State<ShareBitesCard> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.get(
-        'https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/sharebites/post/${widget.post.pk}/comments/get/',
+        'https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/sharebites/post/${widget.post.pk}/comments/get/',
       );
       
       if (mounted) {
@@ -112,7 +112,7 @@ class _ShareBitesCardState extends State<ShareBitesCard> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.postJson(
-        'https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/sharebites/post/${widget.post.pk}/comments/add/',
+        'https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/sharebites/post/${widget.post.pk}/comments/add/',
         jsonEncode({
           'content': _commentController.text.trim(),
           'user_id': 2, // Sesuaikan dengan user_id yang login

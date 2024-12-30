@@ -1,4 +1,4 @@
-# Tugas Kelompok Proyek Tengah Semester Pemrograman Berbasis Platform
+# Tugas Kelompok Proyek Akhir Semester Pemrograman Berbasis Platform
 
 <br>
 
@@ -17,6 +17,7 @@
 # 🥐 BiteTracker 🥐
 
 ### 🔗 [Visit Our Web](https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/)
+### 🔗 [Download Our App](https://install.appcenter.ms/orgs/bite-tracker/apps/bite-tracker/distribution_groups/public/releases/4)
 
 
 **BiteTracker** adalah platform pencarian produk makanan berbasis lokasi yang berfokus di kota **Depok**. Aplikasi ini dirancang untuk memudahkan pengguna dalam menemukan makanan dan toko sesuai dengan preferensi diet dan gaya hidup mereka. Dengan fitur pencarian yang terperinci dan pelacakan asupan kalori, pengguna dapat dengan mudah menemukan makanan yang sesuai kebutuhan serta memantau pola makan mereka.
