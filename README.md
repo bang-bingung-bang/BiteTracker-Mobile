@@ -16,7 +16,7 @@
 
 # 🥐 BiteTracker 🥐
 
-### 🔗 [Visit Our Web](https://faiz-akram-bitetracker.pbp.cs.ui.ac.id/)
+### 🔗 [Visit Our Web](https://faiz-akram-bitetrackers.pbp.cs.ui.ac.id/)
 ### 🔗 [Download Our App](https://install.appcenter.ms/orgs/bite-tracker/apps/bite-tracker/distribution_groups/public/releases/4)
 
 
